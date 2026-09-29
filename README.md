@@ -227,10 +227,11 @@ sps_retail_fulfillment_intelligence/
 ├── SETUP.md                        ← Full replication guide
 ├── DEMO_TALK_TRACK.md              ← Presenter walk-through
 │
-├── SPS_DATAMODEL.md                ← SPS Commerce provider data model
-├── FOOTLOCKER_DATAMODEL.md         ← Foot Locker consumer data model
-├── BASSPRO_DATAMODEL.md            ← Bass Pro Shops consumer data model
-├── URBANOUTFITTERS_DATAMODEL.md    ← Urban Outfitters consumer data model
+├── datamodels/                     ← Data model references per company
+│   ├── SPS_DATAMODEL.md
+│   ├── FOOTLOCKER_DATAMODEL.md
+│   ├── BASSPRO_DATAMODEL.md
+│   └── URBANOUTFITTERS_DATAMODEL.md
 │
 ├── apps/                           ← 5 Streamlit dashboard source files
 │   ├── sps_fulfillment_intelligence.py
@@ -300,10 +301,10 @@ snow sql -f setup/05_streamlit_apps.sql --connection coco_conn
 |---|---|
 | [SETUP.md](SETUP.md) | Complete replication guide with verification steps |
 | [DEMO_TALK_TRACK.md](DEMO_TALK_TRACK.md) | Presenter script: executive opening → 5 dashboards → closing |
-| [SPS_DATAMODEL.md](SPS_DATAMODEL.md) | SPS Commerce data model (EDI documents + activity feed) |
-| [FOOTLOCKER_DATAMODEL.md](FOOTLOCKER_DATAMODEL.md) | Foot Locker data model (banners, sizes, launches) |
-| [BASSPRO_DATAMODEL.md](BASSPRO_DATAMODEL.md) | Bass Pro Shops data model (seasons, regions, climate) |
-| [URBANOUTFITTERS_DATAMODEL.md](URBANOUTFITTERS_DATAMODEL.md) | Urban Outfitters data model (SKU crosswalk, replacement POs) |
+| [SPS_DATAMODEL.md](datamodels/SPS_DATAMODEL.md) | SPS Commerce data model (EDI documents + activity feed) |
+| [FOOTLOCKER_DATAMODEL.md](datamodels/FOOTLOCKER_DATAMODEL.md) | Foot Locker data model (banners, sizes, launches) |
+| [BASSPRO_DATAMODEL.md](datamodels/BASSPRO_DATAMODEL.md) | Bass Pro Shops data model (seasons, regions, climate) |
+| [URBANOUTFITTERS_DATAMODEL.md](datamodels/URBANOUTFITTERS_DATAMODEL.md) | Urban Outfitters data model (SKU crosswalk, replacement POs) |
 
 ---
 
