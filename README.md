@@ -26,43 +26,7 @@ Neither side alone can answer the question that matters most:
 
 Join SPS Commerce's EDI transaction data with each retailer's operational data inside Snowflake. Train a machine learning model on the combined dataset. Deploy five interactive dashboards that turn predictions into action.
 
-```
-┌─────────────────────┐     ┌──────────────────────┐
-│   SPS Commerce      │     │   Retailer Data       │
-│   (Data Provider)   │     │   (Data Consumer)     │
-│                     │     │                       │
-│  • Purchase Orders  │     │  • Store/Banner info  │
-│  • Ship Notices     │     │  • Product Catalog    │
-│  • Invoices         │     │  • Size/Color/SKU     │
-│  • Receipts         │     │  • Seasonal Context   │
-│  • Sales/Inventory  │     │  • Regional Network   │
-└────────┬────────────┘     └───────┬──────────────┘
-         │                          │
-         └──────────┬───────────────┘
-                    │
-            ┌───────▼───────┐
-            │  Snowflake    │
-            │  Data Join    │
-            │               │
-            │  Unified      │
-            │  Fulfillment  │
-            │  Picture      │
-            └───────┬───────┘
-                    │
-            ┌───────▼───────┐
-            │  Snowflake ML │
-            │               │
-            │  Classification│
-            │  Model        │
-            │  91.3% acc    │
-            └───────┬───────┘
-                    │
-            ┌───────▼───────┐
-            │  5 Streamlit  │
-            │  Dashboards   │
-            │  in Snowflake │
-            └───────────────┘
-```
+![architecture](images/architecture_solution.jpeg)
 
 ---
 

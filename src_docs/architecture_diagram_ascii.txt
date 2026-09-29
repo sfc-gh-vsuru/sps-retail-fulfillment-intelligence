@@ -1,0 +1,35 @@
+┌─────────────────────┐     ┌──────────────────────┐
+│   SPS Commerce      │     │   Retailer Data       │
+│   (Data Provider)   │     │   (Data Consumer)     │
+│                     │     │                       │
+│  • Purchase Orders  │     │  • Store/Banner info  │
+│  • Ship Notices     │     │  • Product Catalog    │
+│  • Invoices         │     │  • Size/Color/SKU     │
+│  • Receipts         │     │  • Seasonal Context   │
+│  • Sales/Inventory  │     │  • Regional Network   │
+└────────┬────────────┘     └───────┬──────────────┘
+         │                          │
+         └──────────┬───────────────┘
+                    │
+            ┌───────▼───────┐
+            │  Snowflake    │
+            │  Data Join    │
+            │               │
+            │  Unified      │
+            │  Fulfillment  │
+            │  Picture      │
+            └───────┬───────┘
+                    │
+            ┌───────▼───────┐
+            │  Snowflake ML │
+            │               │
+            │  Classification│
+            │  Model        │
+            │  91.3% acc    │
+            └───────┬───────┘
+                    │
+            ┌───────▼───────┐
+            │  5 Streamlit  │
+            │  Dashboards   │
+            │  in Snowflake │
+            └───────────────┘
