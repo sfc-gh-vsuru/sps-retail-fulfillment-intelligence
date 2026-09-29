@@ -7,7 +7,6 @@
 *SPS Commerce EDI data joined with retailer operations data, powered by Snowflake ML*
 
 ![hero](images/hero_fulfillment_intelligence.png)
-<!-- PLACEHOLDER: Screenshot of the SPS Fulfillment Intelligence dashboard (full page, KPIs + order-to-cash journey visible) -->
 
 </div>
 
@@ -78,14 +77,12 @@ The cross-retailer command center. Tracks OTIF (On-Time, In-Full) delivery rates
 | ![kpis](images/01_fulfillment_kpis.png) | ![journey](images/01_order_to_cash_journey.png) |
 | *Fulfillment KPIs by retailer* | *Order-to-cash journey: the data join visualized* |
 
-<!-- PLACEHOLDER: Two screenshots side by side — (1) KPI metrics cards for all 3 retailers, (2) Order-to-cash funnel chart -->
 
 | | |
 |---|---|
 | ![risk](images/01_ml_risk_predictions.png) | ![suppliers](images/01_supplier_scatter.png) |
 | *ML risk distribution and model accuracy* | *Supplier performance: on-time vs in-full* |
 
-<!-- PLACEHOLDER: Two screenshots — (1) ML risk bar chart + accuracy metrics + feature importance, (2) Supplier scatter plot -->
 
 ---
 
@@ -98,14 +95,12 @@ Footwear launch and size readiness across Foot Locker's four banners: FL, Champs
 **What ML delivers:** Risk flags per banner so teams know where to focus before launch day
 
 ![foot_locker](images/02_foot_locker_banner_performance.png)
-<!-- PLACEHOLDER: Screenshot showing banner performance comparison chart (On-Time % and In-Full % grouped by banner) -->
 
 | | |
 |---|---|
 | ![sizes](images/02_foot_locker_sizes.png) | ![risk](images/02_foot_locker_ml_risk.png) |
 | *Size availability by product group* | *ML-predicted risk by banner* |
 
-<!-- PLACEHOLDER: Two screenshots — (1) Size availability bar chart, (2) ML risk by banner bar chart -->
 
 ---
 
@@ -118,14 +113,12 @@ Seasonal availability and inventory intelligence for outdoor recreation categori
 **What ML delivers:** Supplier reliability scoring during peak seasons — a late outdoor gear supplier in spring has outsized impact
 
 ![bass_pro](images/03_bass_pro_seasonal_heatmap.png)
-<!-- PLACEHOLDER: Screenshot of the seasonal demand heatmap (category x season, colored cells with values) -->
 
 | | |
 |---|---|
 | ![regional](images/03_bass_pro_regional.png) | ![wos](images/03_bass_pro_weeks_of_supply.png) |
 | *Regional sales by season* | *Weeks of supply — stockout vs overstock risk* |
 
-<!-- PLACEHOLDER: Two screenshots — (1) Regional sales grouped bar chart, (2) Weeks of supply bar chart with red/green/yellow risk lines -->
 
 ---
 
@@ -138,14 +131,12 @@ PO revision tracking and SKU readiness for Urban Outfitters' unique vendor progr
 **What ML delivers:** Pre-ship readiness risk combining PO revision patterns, SKU mapping gaps, and supplier history
 
 ![urban_outfitters](images/04_urban_outfitters_replacement_pos.png)
-<!-- PLACEHOLDER: Screenshot of replacement PO tracking stacked bar chart (month x revision type) -->
 
 | | |
 |---|---|
 | ![sku](images/04_urban_outfitters_sku_health.png) | ![readiness](images/04_urban_outfitters_readiness_risk.png) |
 | *SKU crosswalk health (Active/Pending/Unresolved)* | *Pre-ship readiness: ML risk vs lead time* |
 
-<!-- PLACEHOLDER: Two screenshots — (1) SKU donut chart + items needing attention table, (2) Scatter plot of risk vs lead time colored by PO type -->
 
 ---
 
@@ -154,14 +145,12 @@ PO revision tracking and SKU readiness for Urban Outfitters' unique vendor progr
 The value proof. Compares ML model accuracy across all three retailers and shows which data features from the SPS + retailer join drive the most predictive value.
 
 ![value_lab](images/05_partner_value_lab_comparison.png)
-<!-- PLACEHOLDER: Screenshot of cross-retailer performance comparison (grouped bar chart + data table) -->
 
 | | |
 |---|---|
 | ![accuracy](images/05_partner_value_lab_ml_accuracy.png) | ![features](images/05_partner_value_lab_feature_importance.png) |
 | *ML accuracy, precision, recall by retailer* | *Feature importance: what SPS data drives predictions* |
 
-<!-- PLACEHOLDER: Two screenshots — (1) Accuracy/Precision/Recall metric cards for each retailer, (2) Horizontal bar chart of feature importance scores -->
 
 ---
 
