@@ -726,3 +726,91 @@ After completing all steps, verify:
 - [ ] `FULFILLMENT_RISK_MODEL` exists: `SHOW SNOWFLAKE.ML.CLASSIFICATION;`
 - [ ] `FULFILLMENT_PREDICTIONS` table has 9,919 rows with non-null predictions
 - [ ] All 5 Streamlit apps are accessible from Snowsight
+
+---
+
+## Repo Structure
+
+```
+sps_retail_fulfillment_intelligence/
+│
+├── README.md                       ← Project overview and dashboards
+├── SETUP.md                        ← Full replication guide (you are here)
+├── DEMO_TALK_TRACK.md              ← Presenter walk-through
+│
+├── datamodels/                     ← Data model references per company
+│   ├── SPS_DATAMODEL.md
+│   ├── FOOTLOCKER_DATAMODEL.md
+│   ├── BASSPRO_DATAMODEL.md
+│   └── URBANOUTFITTERS_DATAMODEL.md
+│
+├── apps/                           ← 5 Streamlit dashboard source files
+│   ├── sps_fulfillment_intelligence.py
+│   ├── sps_foot_locker.py
+│   ├── sps_bass_pro.py
+│   ├── sps_urban_outfitters.py
+│   └── sps_partner_value_lab.py
+│
+├── data/                           ← All datasets as CSV
+│   ├── shared/                     ← 11 tables (retailer, supplier, item, ...)
+│   │   └── sps_activity.csv.gz    ← 2.9M rows, gzipped (~43MB)
+│   ├── ml_models/                  ← ML training data
+│   └── urban_outfitters/           ← SKU crosswalk
+│
+├── setup/                          ← SQL + shell scripts for full replication
+│   ├── 01_environment.sql          ← Database, schemas, stages
+│   ├── 02_load_data.sql            ← CREATE TABLE + COPY INTO
+│   ├── 03_views.sql                ← Analytical views
+│   ├── 04_ml_model.sql             ← SNOWFLAKE.ML.CLASSIFICATION train + predict
+│   ├── 05_streamlit_apps.sql       ← CREATE STREAMLIT (native runtime)
+│   └── upload_data.sh              ← Upload data + apps to Snowflake stages
+│
+├── images/                         ← Dashboard screenshots
+│
+└── src_docs/                       ← Internal only (gitignored)
+    ├── PLAN.md                     ← Original project plan
+    ├── RESEARCH.md                 ← Research findings and sources
+    ├── DATA_AND_ML_CONTRACTS.md    ← Field-level data contracts
+    ├── PUBLISHED_ACTIVITY_SCHEMA.csv
+    ├── VERIFIED_SHARE_SCHEMA.csv
+    └── sql/                        ← Original data generation scripts
+```
+
+---
+
+## Quick Start
+
+```bash
+# 1. Create database, schemas, and stages
+snow sql -f setup/01_environment.sql --connection coco_conn
+
+# 2. Upload CSV data and Streamlit apps to Snowflake stages
+bash setup/upload_data.sh coco_conn
+
+# 3. Create tables and load data
+snow sql -f setup/02_load_data.sql --connection coco_conn
+
+# 4. Create analytical views
+snow sql -f setup/03_views.sql --connection coco_conn
+
+# 5. Train ML model and generate predictions
+snow sql -f setup/04_ml_model.sql --connection coco_conn
+
+# 6. Deploy Streamlit dashboards
+snow sql -f setup/05_streamlit_apps.sql --connection coco_conn
+```
+
+**Prerequisites:** Snowflake account, [Snowflake CLI](https://docs.snowflake.com/en/developer-guide/snowflake-cli/index) v3.14+, a role with `CREATE DATABASE` privileges.
+
+---
+
+## Documentation
+
+| Document | Description |
+|---|---|
+| [SETUP.md](SETUP.md) | Complete replication guide with verification steps |
+| [DEMO_TALK_TRACK.md](DEMO_TALK_TRACK.md) | Presenter script: executive opening → 5 dashboards → closing |
+| [SPS_DATAMODEL.md](datamodels/SPS_DATAMODEL.md) | SPS Commerce data model (EDI documents + activity feed) |
+| [FOOTLOCKER_DATAMODEL.md](datamodels/FOOTLOCKER_DATAMODEL.md) | Foot Locker data model (banners, sizes, launches) |
+| [BASSPRO_DATAMODEL.md](datamodels/BASSPRO_DATAMODEL.md) | Bass Pro Shops data model (seasons, regions, climate) |
+| [URBANOUTFITTERS_DATAMODEL.md](datamodels/URBANOUTFITTERS_DATAMODEL.md) | Urban Outfitters data model (SKU crosswalk, replacement POs) |
