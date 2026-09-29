@@ -253,7 +253,15 @@ sps_retail_fulfillment_intelligence/
 │   ├── 05_streamlit_apps.sql       ← CREATE STREAMLIT (native runtime)
 │   └── upload_data.sh              ← Upload data + apps to Snowflake stages
 │
-└── images/                         ← Dashboard screenshots
+├── images/                         ← Dashboard screenshots
+│
+└── src_docs/                       ← Internal only (gitignored)
+    ├── PLAN.md                     ← Original project plan
+    ├── RESEARCH.md                 ← Research findings and sources
+    ├── DATA_AND_ML_CONTRACTS.md    ← Field-level data contracts
+    ├── PUBLISHED_ACTIVITY_SCHEMA.csv
+    ├── VERIFIED_SHARE_SCHEMA.csv
+    └── sql/                        ← Original data generation scripts
 ```
 
 ---

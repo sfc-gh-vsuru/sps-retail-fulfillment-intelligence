@@ -1,16 +1,39 @@
 # OS
 .DS_Store
+Thumbs.db
 __pycache__/
 *.pyc
 
-# Snowflake CLI build artifacts
+# ── Snowflake CLI ────────────────────────────────────────────
 output/
 .streamlit/secrets.toml
 
-# IDE
+# ── IDE ──────────────────────────────────────────────────────
 .idea/
 .vscode/
 *.swp
+*.swo
 
-# Deployment copies (source of truth is apps/)
+# ── Deployment working copies (source of truth is apps/) ────
 streamlit_apps/
+
+# ── Source docs: internal research, plans, raw schemas ───────
+# These contain planning notes, research findings, and raw data
+# contracts that are not intended for external distribution.
+# They are tracked in git for internal reference but excluded
+# from any packaged distribution.
+src_docs/
+
+# ── Security: never commit credentials or secrets ────────────
+*.pem
+*.key
+*.p12
+*.pfx
+*.env
+.env.*
+secrets.toml
+credentials.json
+**/secrets/
+**/credentials/
+snowflake.config
+connections.toml
