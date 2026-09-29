@@ -764,6 +764,33 @@ relationships:
     join_type: inner
     relationship_type: many_to_one
 
+  - name: prediction_to_supplier
+    left_table: fulfillment_predictions
+    right_table: suppliers
+    relationship_columns:
+      - left_column: pred_supplier_id
+        right_column: supplier_id
+    join_type: inner
+    relationship_type: many_to_one
+
+  - name: shipment_to_supplier
+    left_table: shipments
+    right_table: suppliers
+    relationship_columns:
+      - left_column: supplier_id
+        right_column: supplier_id
+    join_type: inner
+    relationship_type: many_to_one
+
+  - name: receipt_to_retailer
+    left_table: receipts
+    right_table: retailers
+    relationship_columns:
+      - left_column: retailer_id
+        right_column: retailer_id
+    join_type: inner
+    relationship_type: many_to_one
+
   - name: shipment_to_retailer
     left_table: shipments
     right_table: retailers
