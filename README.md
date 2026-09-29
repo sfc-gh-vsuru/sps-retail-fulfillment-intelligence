@@ -6,8 +6,6 @@
 
 *SPS Commerce EDI data joined with retailer operations data, powered by Snowflake ML*
 
-![hero](images/hero_fulfillment_intelligence.png)
-
 </div>
 
 ---
@@ -27,6 +25,10 @@ Neither side alone can answer the question that matters most:
 Join SPS Commerce's EDI transaction data with each retailer's operational data inside Snowflake. Train a machine learning model on the combined dataset. Deploy five interactive dashboards that turn predictions into action.
 
 ![architecture](images/architecture_solution.jpeg)
+
+### The Result
+
+![hero](images/hero_fulfillment_intelligence.png)
 
 ---
 
