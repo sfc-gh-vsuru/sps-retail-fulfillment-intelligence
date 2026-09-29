@@ -1,0 +1,16 @@
+# OS
+.DS_Store
+__pycache__/
+*.pyc
+
+# Snowflake CLI build artifacts
+output/
+.streamlit/secrets.toml
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Deployment copies (source of truth is apps/)
+streamlit_apps/

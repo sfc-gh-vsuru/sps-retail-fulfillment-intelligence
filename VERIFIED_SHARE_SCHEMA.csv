@@ -1,0 +1,136 @@
+source_id,object_name,column_name,verified_type,nullable,population_status,interpretation,caveat
+LIVE,ACTIVITY,SPS_CUSTOMER_ITEM_KEY,VARCHAR(255),Y,populated,Customer item key,Join with SPS_RETAILER_NAME_KEY
+LIVE,ACTIVITY,SPS_RETAILER_NAME_KEY,VARCHAR(255),Y,populated,Retailer scope key,Generic labels in sample: Shoe Retailer etc
+LIVE,ACTIVITY,SPS_CUSTOMER_LOCATION_KEY,VARCHAR(255),Y,populated,Customer location key,Join with SPS_RETAILER_NAME_KEY
+LIVE,ACTIVITY,SPS_ITEM_MAPPING_KEY,VARCHAR(255),Y,populated,Item mapping key,Same as SPS_CUSTOMER_ITEM_KEY in sample
+LIVE,ACTIVITY,PERIOD_ENDING_DATE,NUMBER(38 0),Y,populated,Reporting period end,YYYYMMDD weekly grain confirmed by RETAILER_METADATA
+LIVE,ACTIVITY,GROSS_SALES_UNITS,VARCHAR(16777216),Y,all_null,Gross units,Not populated in demo sample
+LIVE,ACTIVITY,GROSS_SALES_COST,VARCHAR(16777216),Y,all_null,Gross sales cost,Not populated in demo sample
+LIVE,ACTIVITY,GROSS_SALES_RETAIL,VARCHAR(16777216),Y,all_null,Gross sales retail,Not populated in demo sample
+LIVE,ACTIVITY,GROSS_SALES_MARGIN_VALUE,VARCHAR(16777216),Y,all_null,Gross margin,Not populated in demo sample
+LIVE,ACTIVITY,NET_SALES_UNITS,NUMBER(38 0),Y,populated,Net sales units,Linear pattern in sample
+LIVE,ACTIVITY,NET_SALES_COST,VARCHAR(16777216),Y,all_null,Net sales cost,Not populated in demo sample
+LIVE,ACTIVITY,NET_SALES_RETAIL,NUMBER(19 7),Y,populated,Net sales retail,$,Zero observed for some rows
+LIVE,ACTIVITY,NET_SALES_MARGIN_VALUE,VARCHAR(16777216),Y,all_null,Net margin,Not populated in demo sample
+LIVE,ACTIVITY,CUSTOMER_RETURN_UNITS,VARCHAR(16777216),Y,all_null,Customer returns,Not populated in demo sample
+LIVE,ACTIVITY,CUSTOMER_RETURN_COST,VARCHAR(16777216),Y,all_null,Customer return cost,Not populated in demo sample
+LIVE,ACTIVITY,CUSTOMER_RETURN_RETAIL,VARCHAR(16777216),Y,all_null,Customer return retail,Not populated in demo sample
+LIVE,ACTIVITY,CUSTOMER_RETURN_MARGIN_VALUE,VARCHAR(16777216),Y,all_null,Customer return margin,Not populated in demo sample
+LIVE,ACTIVITY,INVENTORY_UNITS,NUMBER(38 0),Y,populated,Inventory snapshot units,Negative observed; not additive across dates
+LIVE,ACTIVITY,INVENTORY_COST,VARCHAR(16777216),Y,all_null,Inventory cost,Not populated in demo sample
+LIVE,ACTIVITY,INVENTORY_RETAIL,VARCHAR(16777216),Y,all_null,Inventory retail,Not populated in demo sample
+LIVE,ACTIVITY,ON_ORDER_UNITS,NUMBER(38 0),Y,populated,On-order units,Linear pattern in sample
+LIVE,ACTIVITY,ON_ORDER_COST,VARCHAR(16777216),Y,all_null,On-order cost,Not populated in demo sample
+LIVE,ACTIVITY,ON_ORDER_RETAIL,VARCHAR(16777216),Y,all_null,On-order retail,Not populated in demo sample
+LIVE,ACTIVITY,RECEIPT_UNITS,NUMBER(38 0),Y,populated,Received units,All zero in sample
+LIVE,ACTIVITY,RECEIPT_COST,VARCHAR(16777216),Y,all_null,Receipt cost,Not populated in demo sample
+LIVE,ACTIVITY,RECEIPT_RETAIL,VARCHAR(16777216),Y,all_null,Receipt retail,Not populated in demo sample
+LIVE,ACTIVITY,IN_TRANSIT_UNITS,NUMBER(38 0),Y,populated,In-transit units,All zero in sample
+LIVE,ACTIVITY,IN_TRANSIT_COST,VARCHAR(16777216),Y,all_null,In-transit cost,Not populated in demo sample
+LIVE,ACTIVITY,IN_TRANSIT_RETAIL,VARCHAR(16777216),Y,all_null,In-transit retail,Not populated in demo sample
+LIVE,ACTIVITY,RETURN_TO_VENDOR_UNITS,VARCHAR(16777216),Y,all_null,RTV units,Not populated in demo sample
+LIVE,ACTIVITY,RETURN_TO_VENDOR_COST,VARCHAR(16777216),Y,all_null,RTV cost,Not populated in demo sample
+LIVE,ACTIVITY,RETURN_TO_VENDOR_RETAIL,VARCHAR(16777216),Y,all_null,RTV retail,Not populated in demo sample
+LIVE,ACTIVITY,INVENTORY_ADJUSTMENT_UNITS,VARCHAR(16777216),Y,all_null,Adjustment units,Not populated in demo sample
+LIVE,ACTIVITY,INVENTORY_ADJUSTMENT_COST,VARCHAR(16777216),Y,all_null,Adjustment cost,Not populated in demo sample
+LIVE,ACTIVITY,INVENTORY_ADJUSTMENT_RETAIL,VARCHAR(16777216),Y,all_null,Adjustment retail,Not populated in demo sample
+LIVE,ACTIVITY,PERMANENT_MARKDOWN_VALUES,VARCHAR(16777216),Y,all_null,Perm markdown,Not populated in demo sample
+LIVE,ACTIVITY,POINT_OF_SALE_MARKDOWN_VALUES,VARCHAR(16777216),Y,all_null,POS markdown,Not populated in demo sample
+LIVE,ACTIVITY,TOTAL_MARKDOWN_VALUES,VARCHAR(16777216),Y,all_null,Total markdown,Not populated in demo sample
+LIVE,ACTIVITY,CORPORATE_UNIT_ADJUSTED_COST,NUMBER(19 7),Y,populated,Adjusted unit cost,Populated; not additive
+LIVE,ACTIVITY,CORPORATE_UNIT_ACQUIRED_COST,NUMBER(19 7),Y,populated,Acquired unit cost,Populated; not additive
+LIVE,ACTIVITY,CORPORATE_UNIT_OWNED_RETAIL_PRICE,NUMBER(19 7),Y,populated,Owned retail price,Populated; not additive
+LIVE,ACTIVITY,INSERT_TIMESTAMP,TIMESTAMP_NTZ(9),Y,populated,Insertion timestamp,Single date 2024-05-08; NTZ
+LIVE,ITEM,SPS_RETAILER_NAME_KEY,VARCHAR(255),Y,populated,Retailer key,
+LIVE,ITEM,SPS_CUSTOMER_ITEM_KEY,VARCHAR(255),Y,populated,Item key,
+LIVE,ITEM,SPS_ITEM_MAPPING_KEY,VARCHAR(255),Y,populated,Mapping key,
+LIVE,ITEM,PRODUCT_ID,VARCHAR(16777216),Y,populated,Product ID,
+LIVE,ITEM,PRODUCT_TYPE_ID,VARCHAR(16777216),Y,populated,Product type ID,
+LIVE,ITEM,VENDOR_CODE,VARCHAR(16777216),Y,all_null,Vendor code,Schema present but unpopulated
+LIVE,ITEM,VENDOR_NAME,VARCHAR(16777216),Y,all_null,Vendor name,Schema present but unpopulated
+LIVE,ITEM,BRAND_CODE,VARCHAR(16777216),Y,all_null,Brand code,Schema present but unpopulated
+LIVE,ITEM,BRAND_NAME,VARCHAR(16777216),Y,all_null,Brand name,Schema present but unpopulated
+LIVE,ITEM,DUNS_NUMBER,VARCHAR(16777216),Y,all_null,DUNS number,Schema present but unpopulated
+LIVE,ITEM,DIVISION_CODE,VARCHAR(16777216),Y,all_null,Division code,Schema present but unpopulated
+LIVE,ITEM,DIVISION_NAME,VARCHAR(16777216),Y,all_null,Division name,Schema present but unpopulated
+LIVE,ITEM,MAJOR_DEPARTMENT_CODE,VARCHAR(16777216),Y,all_null,Major dept code,Schema present but unpopulated
+LIVE,ITEM,MAJOR_DEPARTMENT_NAME,VARCHAR(16777216),Y,all_null,Major dept name,Schema present but unpopulated
+LIVE,ITEM,DEPARTMENT_CODE,VARCHAR(16777216),Y,all_null,Department code,Schema present but unpopulated
+LIVE,ITEM,DEPARTMENT_NAME,VARCHAR(16777216),Y,all_null,Department name,Schema present but unpopulated
+LIVE,ITEM,SUB_DEPARTMENT_CODE,VARCHAR(16777216),Y,all_null,Sub-department code,Schema present but unpopulated
+LIVE,ITEM,SUB_DEPARTMENT_NAME,VARCHAR(16777216),Y,all_null,Sub-department name,Schema present but unpopulated
+LIVE,ITEM,MAJOR_CLASS_CODE,VARCHAR(16777216),Y,all_null,Major class code,Schema present but unpopulated
+LIVE,ITEM,MAJOR_CLASS_NAME,VARCHAR(16777216),Y,all_null,Major class name,Schema present but unpopulated
+LIVE,ITEM,CLASS_CODE,VARCHAR(16777216),Y,all_null,Class code,Schema present but unpopulated
+LIVE,ITEM,CLASS_NAME,VARCHAR(16777216),Y,all_null,Class name,Schema present but unpopulated
+LIVE,ITEM,SUB_CLASS_CODE,VARCHAR(16777216),Y,all_null,Sub-class code,Schema present but unpopulated
+LIVE,ITEM,SUB_CLASS_NAME,VARCHAR(16777216),Y,all_null,Sub-class name,Schema present but unpopulated
+LIVE,ITEM,CATEGORY_CODE,VARCHAR(16777216),Y,all_null,Category code,Schema present but unpopulated
+LIVE,ITEM,CATEGORY_NAME,VARCHAR(255),Y,populated,Category name,2 values: APPAREL and FOOTWEAR
+LIVE,ITEM,SUB_CATEGORY_CODE,VARCHAR(16777216),Y,all_null,Sub-category code,Schema present but unpopulated
+LIVE,ITEM,SUB_CATEGORY_NAME,VARCHAR(16777216),Y,all_null,Sub-category name,Schema present but unpopulated
+LIVE,ITEM,PRODUCT_GROUP_CODE,VARCHAR(16777216),Y,all_null,Product group code,Schema present but unpopulated
+LIVE,ITEM,PRODUCT_GROUP_NAME,VARCHAR(255),Y,populated,Product group name,10 values: HEADGEAR JACKETS PANTS TOPS SHIRTS BOOTS SNEAKERS etc
+LIVE,ITEM,GENDER,VARCHAR(255),Y,populated,Gender,3 values: Mens/Unisex Womens Kids
+LIVE,ITEM,STYLE_NUMBER,VARCHAR(255),Y,populated,Style number,28 distinct
+LIVE,ITEM,STYLE_DESCRIPTION,VARCHAR(255),Y,populated,Style description,
+LIVE,ITEM,COLOR_CODE,VARCHAR(16777216),Y,all_null,Color code,Schema present but unpopulated
+LIVE,ITEM,COLOR_NAME,VARCHAR(255),Y,populated,Color name,41 colors
+LIVE,ITEM,SIZE_CODE,VARCHAR(16777216),Y,all_null,Size code,Schema present but unpopulated
+LIVE,ITEM,SIZE_NAME,VARCHAR(255),Y,populated,Size name,22 sizes including OSFA XS-XXL and numeric shoe sizes
+LIVE,ITEM,UPC,VARCHAR(255),Y,populated,UPC barcode,All 86 items have UPC
+LIVE,ITEM,SKU,VARCHAR(16777216),Y,all_null,SKU,Schema present but unpopulated
+LIVE,ITEM,VENDOR_STYLE_NUMBER,VARCHAR(16777216),Y,all_null,Vendor style number,Schema present but unpopulated
+LIVE,ITEM,VENDOR_STYLE_DESCRIPTION,VARCHAR(16777216),Y,all_null,Vendor style description,Schema present but unpopulated
+LIVE,ITEM,PRODUCT_DESCRIPTION,VARCHAR(16777216),Y,populated,Product description,
+LIVE,ITEM,CORPORATE_UNIT_ACQUIRED_COST,VARCHAR(16777216),Y,all_null,Acquired cost (item dim),Schema present but unpopulated
+LIVE,ITEM,CORPORATE_UNIT_ADJUSTED_COST,VARCHAR(16777216),Y,all_null,Adjusted cost (item dim),Schema present but unpopulated
+LIVE,ITEM,CORPORATE_UNIT_OWNED_RETAIL_PRICE,VARCHAR(16777216),Y,all_null,Owned retail (item dim),Schema present but unpopulated
+LIVE,ITEM,MSRP,NUMBER(9 6),Y,populated,MSRP,$15-$90 range
+LIVE,ITEM,COST,NUMBER(8 6),Y,populated,Cost,$6.75-$49.50 range
+LIVE,ITEM,REPLENISHMENT_INDICATOR,VARCHAR(16777216),Y,all_null,Replenishment flag,Schema present but unpopulated
+LIVE,ITEM,MARKDOWN_INDICATOR,VARCHAR(16777216),Y,all_null,Markdown flag,Schema present but unpopulated
+LIVE,ITEM,FIRST_RECEIPT_DATE,VARCHAR(16777216),Y,all_null,First receipt date,Schema present but unpopulated
+LIVE,ITEM,LAST_RECEIPT_DATE,VARCHAR(16777216),Y,all_null,Last receipt date,Schema present but unpopulated
+LIVE,ITEM,PRODUCT_SEASON,VARCHAR(16777216),Y,all_null,Product season,Schema present but unpopulated
+LIVE,ITEM,AGE,VARCHAR(16777216),Y,all_null,Age,Schema present but unpopulated
+LIVE,ITEM,UNIT_OF_MEASURE,VARCHAR(16777216),Y,all_null,UOM,Schema present but unpopulated
+LIVE,ITEM,FEDAS_CODE,VARCHAR(16777216),Y,all_null,FEDAS code,Schema present but unpopulated
+LIVE,ITEM,SPS_ITEM_STATUS,VARCHAR(255),Y,populated,Item status,
+LIVE,ITEM,INSERT_TIMESTAMP,TIMESTAMP_NTZ(9),Y,populated,Insertion timestamp,
+LIVE,LOCATION,SPS_RETAILER_NAME_KEY,VARCHAR(255),Y,populated,Retailer key,
+LIVE,LOCATION,SPS_CUSTOMER_LOCATION_KEY,VARCHAR(255),Y,populated,Location key,
+LIVE,LOCATION,LOCATION_ID,VARCHAR(16777216),Y,populated,Location ID,
+LIVE,LOCATION,RETAILER_NAME,VARCHAR(255),Y,populated,Retailer display name,Same as SPS_RETAILER_NAME_KEY
+LIVE,LOCATION,STORE_NUMBER,VARCHAR(255),Y,populated,Store number,Preserve leading zeros
+LIVE,LOCATION,STORE_NAME,VARCHAR(255),Y,populated,Store name,Generic: Shoe Retailer #580 etc
+LIVE,LOCATION,ADDRESS,VARCHAR(255),Y,populated,Street address,
+LIVE,LOCATION,ADDRESS_2,VARCHAR(255),Y,sparse,Address line 2,
+LIVE,LOCATION,CITY,VARCHAR(255),Y,populated,City,Some show OTHER
+LIVE,LOCATION,STATE,VARCHAR(255),Y,populated,State,Some show OTHER
+LIVE,LOCATION,POSTAL_CODE,VARCHAR(255),Y,populated,Postal code,
+LIVE,LOCATION,OPEN_DATE,DATE,Y,sparse,Store open date,
+LIVE,LOCATION,CLOSE_DATE,DATE,Y,sparse,Store close date,
+LIVE,LOCATION,MALL,VARCHAR(255),Y,sparse,Mall name,
+LIVE,LOCATION,SPS_LOCATION_TYPE,VARCHAR(255),Y,populated,Location type,STORE or INTERNET
+LIVE,LOCATION,SPS_COUNTRY_CODE,VARCHAR(255),Y,populated,Country code,
+LIVE,LOCATION,SPS_COUNTRY,VARCHAR(255),Y,populated,Country name,
+LIVE,LOCATION,SPS_LATITUDE,NUMBER(8 6),Y,populated,Latitude,0.0 for OTHER locations
+LIVE,LOCATION,SPS_LONGITUDE,NUMBER(9 6),Y,populated,Longitude,0.0 for OTHER locations
+LIVE,LOCATION,COUNTRY,VARCHAR(16777216),Y,all_null,Country (alt),Schema present but unpopulated
+LIVE,LOCATION,STORE_RANK,VARCHAR(16777216),Y,all_null,Store rank,Schema present but unpopulated
+LIVE,LOCATION,STORE_CLASSIFICATION,VARCHAR(16777216),Y,all_null,Store classification,Schema present but unpopulated
+LIVE,LOCATION,LOCATION_TYPE,VARCHAR(16777216),Y,all_null,Location type (alt),Schema present but unpopulated
+LIVE,LOCATION,DEMOGRAPHIC,VARCHAR(16777216),Y,all_null,Demographic,Schema present but unpopulated
+LIVE,LOCATION,REGION,VARCHAR(16777216),Y,all_null,Region,Schema present but unpopulated
+LIVE,LOCATION,CLIMATE,VARCHAR(16777216),Y,all_null,Climate,Schema present but unpopulated
+LIVE,LOCATION,COMP_STORE_INDICATOR,VARCHAR(16777216),Y,all_null,Comp store flag,Schema present but unpopulated
+LIVE,LOCATION,STORE_SIZE,VARCHAR(16777216),Y,all_null,Store size,Schema present but unpopulated
+LIVE,LOCATION,RETAILER_DIVISION,VARCHAR(16777216),Y,all_null,Retailer division,Schema present but unpopulated
+LIVE,LOCATION,BANNER,VARCHAR(16777216),Y,all_null,Banner,Schema present but unpopulated
+LIVE,LOCATION,GLN,VARCHAR(16777216),Y,all_null,GLN,Schema present but unpopulated
+LIVE,LOCATION,CURRENCY_CODE,VARCHAR(16777216),Y,all_null,Currency code,Schema present but unpopulated
+LIVE,LOCATION,INSERT_TIMESTAMP,TIMESTAMP_NTZ(9),Y,populated,Insertion timestamp,
+LIVE,LOCATION,UPDATE_TIMESTAMP,VARCHAR(16777216),Y,all_null,Update timestamp,Schema present but unpopulated; VARCHAR not TIMESTAMP
+LIVE,RETAILER_METADATA,SPS_RETAILER_NAME_KEY,VARCHAR(255),Y,populated,Retailer key,12 generic retailers
+LIVE,RETAILER_METADATA,ACTIVITYGRAIN,VARCHAR(6),Y,populated,Reporting grain,All WEEKLY in this sample

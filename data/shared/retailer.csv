@@ -1,0 +1,4 @@
+"RETAILER_ID","RETAILER_NAME","ENTERPRISE_NAME","INDUSTRY_SEGMENT","DEFAULT_CURRENCY","DEFAULT_TIMEZONE","EDI_PARTNER","PO_REVISION_METHOD","USES_UPC","ACTIVITY_GRAIN","IS_SYNTHETIC"
+"FL","Foot Locker","Foot Locker Inc.","Athletic Footwear & Apparel","USD","America/New_York","Multiple EDI providers","EDI_860",true,"WEEKLY",true
+"BP","Bass Pro Shops","Bass Pro Shops","Outdoor Recreation","USD","America/Chicago","SPS Commerce","EDI_860",true,"WEEKLY",true
+"UO","Urban Outfitters","URBN Inc.","Fashion & Lifestyle","USD","America/New_York","SPS Commerce (exclusive)","REPLACEMENT_850",false,"WEEKLY",true

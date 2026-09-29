@@ -1,0 +1,21 @@
+"SUPPLIER_ID","SUPPLIER_NAME","REGION","COUNTRY","CATEGORY_SPECIALTY","RELIABILITY_TIER","AVG_LEAD_DAYS","LEAD_VARIABILITY_DAYS","ONBOARDED_DATE","IS_SYNTHETIC"
+"SUP_000","Apex Athletic Co","Southeast US","USA","Athletic Footwear","HIGH",12.0,1.5,"2023-05-13",true
+"SUP_001","Summit Gear Works","Midwest US","USA","Outdoor Gear","HIGH",12.0,2.0,"2020-05-29",true
+"SUP_002","Pacific Trail Mfg","West Coast US","USA","Casual Apparel","MEDIUM",11.0,3.0,"2020-03-30",true
+"SUP_003","Eastbound Textiles","Northeast US","USA","Fashion Apparel","HIGH",6.0,1.0,"2022-04-10",true
+"SUP_004","Coastal Footwear Ltd","Southeast US","USA","Performance Footwear","MEDIUM",14.0,2.5,"2020-05-30",true
+"SUP_005","Northern Outfitters","Midwest US","USA","Cold Weather Gear","MEDIUM",17.0,3.5,"2023-08-28",true
+"SUP_006","Metro Style Group","Northeast US","USA","Urban Fashion","HIGH",8.0,1.0,"2023-07-25",true
+"SUP_007","Canyon Sports Intl","Southwest US","USA","Sports Equipment","LOW",16.0,5.0,"2022-12-05",true
+"SUP_008","Horizon Imports","West Coast US","CHN","Mixed Categories","LOW",25.0,7.0,"2023-04-14",true
+"SUP_009","Redwood Leather Co","Northwest US","USA","Leather Goods","MEDIUM",13.0,3.0,"2021-01-28",true
+"SUP_010","Tidewater Apparel","Southeast US","USA","Casual Wear","HIGH",7.0,1.5,"2022-06-19",true
+"SUP_011","Great Lakes Mfg","Midwest US","USA","Headwear & Accessories","MEDIUM",10.0,2.0,"2022-11-19",true
+"SUP_012","Heritage Boot Works","Southwest US","USA","Boots & Workwear","HIGH",10.0,2.0,"2021-01-05",true
+"SUP_013","Pinnacle Sports Co","Northeast US","USA","Athletic Apparel","MEDIUM",12.0,3.0,"2021-02-08",true
+"SUP_014","River Valley Mfg","Southeast US","USA","Outdoor Apparel","LOW",16.0,6.0,"2020-07-01",true
+"SUP_015","Skyline Imports Ltd","West Coast US","VNM","Footwear Components","MEDIUM",25.0,5.0,"2020-05-19",true
+"SUP_016","Prairie Wind Co","Midwest US","USA","Hunting & Fishing","HIGH",13.0,2.0,"2021-08-27",true
+"SUP_017","Harbor Trading LLC","Northeast US","USA","Accessories","LOW",17.0,4.5,"2022-08-14",true
+"SUP_018","Blue Ridge Supply","Southeast US","USA","Camping Gear","MEDIUM",10.0,3.0,"2021-11-22",true
+"SUP_019","Frontier Goods Inc","Southwest US","MEX","Casual Footwear","MEDIUM",21.0,4.0,"2022-12-15",true
