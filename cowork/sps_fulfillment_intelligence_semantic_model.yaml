@@ -1,0 +1,857 @@
+name: sps_fulfillment_intelligence
+description: >
+  SPS Commerce Retail Fulfillment Intelligence — combines SPS-provided EDI transaction data
+  (purchase orders, shipments, invoices) with retailer operational data (locations, items, receipts)
+  and ML-predicted fulfillment risk across Foot Locker, Bass Pro Shops, and Urban Outfitters.
+  Covers OTIF performance, supplier reliability, invoice reconciliation, and order fulfillment lifecycle.
+
+tables:
+  - name: purchase_orders
+    description: >
+      EDI 850 purchase orders issued by retailers to suppliers. Each row is a PO header with order totals,
+      dates, and status. Replacement POs (IS_REPLACEMENT_850=TRUE) are re-issued orders used by
+      Urban Outfitters instead of EDI 860 revisions.
+    base_table:
+      database: SPS_RETAIL_AI
+      schema: SHARED
+      table: PURCHASE_ORDER
+    dimensions:
+      - name: po_id
+        description: Unique purchase order identifier
+        expr: PO_ID
+        data_type: TEXT
+      - name: po_number
+        description: Human-readable PO number
+        expr: PO_NUMBER
+        data_type: TEXT
+      - name: retailer_id
+        description: "Retailer code: FL=Foot Locker, BP=Bass Pro, UO=Urban Outfitters"
+        expr: RETAILER_ID
+        data_type: TEXT
+        sample_values:
+          - "FL"
+          - "BP"
+          - "UO"
+      - name: supplier_id
+        description: Supplier identifier linking to the supplier table
+        expr: SUPPLIER_ID
+        data_type: TEXT
+      - name: ship_to_location_id
+        description: Destination store/DC location ID
+        expr: SHIP_TO_LOCATION_ID
+        data_type: TEXT
+      - name: po_status
+        description: Current PO status (OPEN, CLOSED, CANCELLED)
+        expr: PO_STATUS
+        data_type: TEXT
+        sample_values:
+          - "OPEN"
+          - "CLOSED"
+          - "CANCELLED"
+      - name: is_replacement_850
+        description: Whether this is a replacement PO (Urban Outfitters pattern instead of EDI 860 revision)
+        expr: IS_REPLACEMENT_850
+        data_type: BOOLEAN
+      - name: acceptance_status
+        description: Supplier acceptance status for the PO
+        expr: ACCEPTANCE_STATUS
+        data_type: TEXT
+      - name: currency
+        description: Currency code for the order
+        expr: CURRENCY
+        data_type: TEXT
+    time_dimensions:
+      - name: order_date
+        description: Date the purchase order was placed
+        expr: ORDER_DATE
+        data_type: DATE
+      - name: requested_ship_date
+        description: Date the retailer requested the shipment
+        expr: REQUESTED_SHIP_DATE
+        data_type: DATE
+      - name: requested_delivery_date
+        description: Date the retailer requested delivery by
+        expr: REQUESTED_DELIVERY_DATE
+        data_type: DATE
+    facts:
+      - name: total_units
+        description: Total units ordered on this PO
+        expr: TOTAL_UNITS
+        data_type: NUMBER
+      - name: total_cost
+        description: Total wholesale cost of the PO in dollars
+        expr: TOTAL_COST
+        data_type: NUMBER
+      - name: total_retail
+        description: Total retail value of the PO in dollars
+        expr: TOTAL_RETAIL
+        data_type: NUMBER
+      - name: po_version
+        description: PO revision version number (1 = original)
+        expr: PO_VERSION
+        data_type: NUMBER
+
+  - name: po_lines
+    description: >
+      Individual line items within purchase orders. Each line references a specific item (SKU)
+      with ordered, shipped, received, and invoiced quantities for fulfillment tracking.
+    base_table:
+      database: SPS_RETAIL_AI
+      schema: SHARED
+      table: PO_LINE
+    dimensions:
+      - name: po_line_id
+        description: Unique line item identifier
+        expr: PO_LINE_ID
+        data_type: TEXT
+      - name: po_id
+        description: Parent purchase order ID
+        expr: PO_ID
+        data_type: TEXT
+      - name: item_id
+        description: Item/SKU identifier
+        expr: ITEM_ID
+        data_type: TEXT
+      - name: line_status
+        description: Line fulfillment status
+        expr: LINE_STATUS
+        data_type: TEXT
+    facts:
+      - name: ordered_qty
+        description: Quantity ordered on this line
+        expr: ORDERED_QTY
+        data_type: NUMBER
+      - name: shipped_qty
+        description: Quantity shipped against this line
+        expr: SHIPPED_QTY
+        data_type: NUMBER
+      - name: received_qty
+        description: Quantity received at destination
+        expr: RECEIVED_QTY
+        data_type: NUMBER
+      - name: invoiced_qty
+        description: Quantity invoiced for payment
+        expr: INVOICED_QTY
+        data_type: NUMBER
+      - name: unit_price
+        description: Price per unit in dollars
+        expr: UNIT_PRICE
+        data_type: NUMBER
+      - name: line_total
+        description: Total line value (ordered_qty * unit_price) in dollars
+        expr: LINE_TOTAL
+        data_type: NUMBER
+      - name: line_number
+        description: Sequential line number within the PO
+        expr: LINE_NUMBER
+        data_type: NUMBER
+
+  - name: shipments
+    description: >
+      EDI 856 advance ship notices (ASNs). Each row is a shipment against a PO with carrier info,
+      dates, and on-time/in-full flags computed by comparing actual delivery to requested delivery.
+    base_table:
+      database: SPS_RETAIL_AI
+      schema: SHARED
+      table: SHIPMENT
+    dimensions:
+      - name: shipment_id
+        description: Unique shipment identifier
+        expr: SHIPMENT_ID
+        data_type: TEXT
+      - name: asn_number
+        description: Advance Ship Notice number
+        expr: ASN_NUMBER
+        data_type: TEXT
+      - name: po_id
+        description: Associated purchase order ID
+        expr: PO_ID
+        data_type: TEXT
+      - name: supplier_id
+        description: Shipping supplier ID
+        expr: SUPPLIER_ID
+        data_type: TEXT
+      - name: retailer_id
+        description: Destination retailer ID
+        expr: RETAILER_ID
+        data_type: TEXT
+      - name: carrier
+        description: Shipping carrier name (UPS, FedEx, etc.)
+        expr: CARRIER
+        data_type: TEXT
+      - name: shipment_status
+        description: Current shipment status (DELIVERED, IN_TRANSIT, etc.)
+        expr: SHIPMENT_STATUS
+        data_type: TEXT
+      - name: on_time_flag
+        description: Whether shipment arrived by the requested delivery date
+        expr: ON_TIME_FLAG
+        data_type: BOOLEAN
+      - name: in_full_flag
+        description: Whether the full ordered quantity was shipped
+        expr: IN_FULL_FLAG
+        data_type: BOOLEAN
+      - name: origin_location
+        description: Shipment origin location
+        expr: ORIGIN_LOCATION
+        data_type: TEXT
+      - name: destination_location_id
+        description: Destination store/DC location ID
+        expr: DESTINATION_LOCATION_ID
+        data_type: TEXT
+    time_dimensions:
+      - name: ship_date
+        description: Date the shipment left the supplier
+        expr: SHIP_DATE
+        data_type: DATE
+      - name: estimated_delivery_date
+        description: Carrier-estimated delivery date
+        expr: ESTIMATED_DELIVERY_DATE
+        data_type: DATE
+      - name: actual_delivery_date
+        description: Actual delivery date at destination
+        expr: ACTUAL_DELIVERY_DATE
+        data_type: DATE
+    facts:
+      - name: shipment_units
+        description: Total units in the shipment
+        expr: TOTAL_UNITS
+        data_type: NUMBER
+      - name: total_cartons
+        description: Number of cartons in the shipment
+        expr: TOTAL_CARTONS
+        data_type: NUMBER
+
+  - name: receipts
+    description: >
+      EDI 861 receiving advice. Each row records what was actually received at the retailer
+      location, including damaged units and days late relative to requested delivery.
+    base_table:
+      database: SPS_RETAIL_AI
+      schema: SHARED
+      table: RECEIPT
+    dimensions:
+      - name: receipt_id
+        description: Unique receipt identifier
+        expr: RECEIPT_ID
+        data_type: TEXT
+      - name: shipment_id
+        description: Associated shipment ID
+        expr: SHIPMENT_ID
+        data_type: TEXT
+      - name: po_id
+        description: Associated purchase order ID
+        expr: PO_ID
+        data_type: TEXT
+      - name: retailer_id
+        description: Receiving retailer ID
+        expr: RETAILER_ID
+        data_type: TEXT
+      - name: receipt_status
+        description: Receipt status (COMPLETE, PARTIAL, etc.)
+        expr: RECEIPT_STATUS
+        data_type: TEXT
+    time_dimensions:
+      - name: receipt_date
+        description: Date goods were received at the retailer location
+        expr: RECEIPT_DATE
+        data_type: DATE
+    facts:
+      - name: total_received_units
+        description: Total units received
+        expr: TOTAL_RECEIVED_UNITS
+        data_type: NUMBER
+      - name: total_damaged_units
+        description: Units received in damaged condition
+        expr: TOTAL_DAMAGED_UNITS
+        data_type: NUMBER
+      - name: days_late
+        description: Days late relative to requested delivery date (0 = on time, negative = early)
+        expr: DAYS_LATE
+        data_type: NUMBER
+
+  - name: invoices
+    description: >
+      EDI 810 invoices sent by suppliers for payment. Includes mismatch detection flags
+      that identify discrepancies between invoiced amounts and PO/shipment quantities.
+    base_table:
+      database: SPS_RETAIL_AI
+      schema: SHARED
+      table: INVOICE
+    dimensions:
+      - name: invoice_id
+        description: Unique invoice identifier
+        expr: INVOICE_ID
+        data_type: TEXT
+      - name: invoice_number
+        description: Invoice document number
+        expr: INVOICE_NUMBER
+        data_type: TEXT
+      - name: po_id
+        description: Associated purchase order ID
+        expr: PO_ID
+        data_type: TEXT
+      - name: shipment_id
+        description: Associated shipment ID
+        expr: SHIPMENT_ID
+        data_type: TEXT
+      - name: supplier_id
+        description: Invoicing supplier ID
+        expr: SUPPLIER_ID
+        data_type: TEXT
+      - name: retailer_id
+        description: Billed retailer ID
+        expr: RETAILER_ID
+        data_type: TEXT
+      - name: payment_status
+        description: Invoice payment status (PAID, PENDING, DISPUTED)
+        expr: PAYMENT_STATUS
+        data_type: TEXT
+        sample_values:
+          - "PAID"
+          - "PENDING"
+          - "DISPUTED"
+      - name: mismatch_flag
+        description: Whether the invoice has a quantity or amount mismatch with the PO/shipment
+        expr: MISMATCH_FLAG
+        data_type: BOOLEAN
+      - name: mismatch_reason
+        description: Description of the mismatch if mismatch_flag is true
+        expr: MISMATCH_REASON
+        data_type: TEXT
+    time_dimensions:
+      - name: invoice_date
+        description: Date the invoice was issued
+        expr: INVOICE_DATE
+        data_type: DATE
+      - name: due_date
+        description: Payment due date
+        expr: DUE_DATE
+        data_type: DATE
+    facts:
+      - name: invoice_total
+        description: Total invoice amount in dollars
+        expr: INVOICE_TOTAL
+        data_type: NUMBER
+
+  - name: retailers
+    description: >
+      Retailer reference data. Three retailers: Foot Locker (FL), Bass Pro Shops (BP),
+      and Urban Outfitters (UO), each with different EDI patterns and revision methods.
+    base_table:
+      database: SPS_RETAIL_AI
+      schema: SHARED
+      table: RETAILER
+    dimensions:
+      - name: retailer_id
+        description: Unique retailer code
+        expr: RETAILER_ID
+        data_type: TEXT
+      - name: retailer_name
+        description: Full retailer name
+        expr: RETAILER_NAME
+        data_type: TEXT
+        sample_values:
+          - "Foot Locker"
+          - "Bass Pro Shops"
+          - "Urban Outfitters"
+      - name: industry_segment
+        description: Retail industry segment (Athletic, Outdoor, Fashion)
+        expr: INDUSTRY_SEGMENT
+        data_type: TEXT
+      - name: po_revision_method
+        description: How the retailer handles PO revisions (EDI_860 or REPLACEMENT_850)
+        expr: PO_REVISION_METHOD
+        data_type: TEXT
+
+  - name: suppliers
+    description: >
+      Supplier reference data with reliability tiers and lead time metrics.
+      Suppliers ship goods to retailers on behalf of purchase orders.
+    base_table:
+      database: SPS_RETAIL_AI
+      schema: SHARED
+      table: SUPPLIER
+    dimensions:
+      - name: supplier_id
+        description: Unique supplier identifier
+        expr: SUPPLIER_ID
+        data_type: TEXT
+      - name: supplier_name
+        description: Supplier company name
+        expr: SUPPLIER_NAME
+        data_type: TEXT
+      - name: supplier_region
+        description: Geographic region of the supplier
+        expr: REGION
+        data_type: TEXT
+      - name: country
+        description: Supplier country code
+        expr: COUNTRY
+        data_type: TEXT
+      - name: category_specialty
+        description: Product category the supplier specializes in
+        expr: CATEGORY_SPECIALTY
+        data_type: TEXT
+      - name: reliability_tier
+        description: Supplier reliability rating (HIGH, MEDIUM, LOW)
+        expr: RELIABILITY_TIER
+        data_type: TEXT
+        sample_values:
+          - "HIGH"
+          - "MEDIUM"
+          - "LOW"
+    facts:
+      - name: avg_lead_days
+        description: Average lead time in days from order to delivery
+        expr: AVG_LEAD_DAYS
+        data_type: NUMBER
+      - name: lead_variability_days
+        description: Standard deviation of lead time in days
+        expr: LEAD_VARIABILITY_DAYS
+        data_type: NUMBER
+
+  - name: locations
+    description: >
+      Retailer store and distribution center locations with geographic and operational attributes.
+      Includes Foot Locker banners (Foot Locker, Kids Foot Locker, Champs Sports),
+      Bass Pro regions and climate zones, and Urban Outfitters store classifications.
+    base_table:
+      database: SPS_RETAIL_AI
+      schema: SHARED
+      table: LOCATION
+    dimensions:
+      - name: location_id
+        description: Unique location identifier
+        expr: LOCATION_ID
+        data_type: TEXT
+      - name: retailer_id
+        description: Owning retailer ID
+        expr: RETAILER_ID
+        data_type: TEXT
+      - name: store_name
+        description: Store or DC name
+        expr: STORE_NAME
+        data_type: TEXT
+      - name: location_type
+        description: Location type (STORE or DC)
+        expr: LOCATION_TYPE
+        data_type: TEXT
+      - name: city
+        description: City
+        expr: CITY
+        data_type: TEXT
+      - name: state
+        description: US state abbreviation
+        expr: STATE
+        data_type: TEXT
+      - name: region
+        description: Geographic region (Northeast, Southeast, Midwest, West, Southwest)
+        expr: REGION
+        data_type: TEXT
+      - name: climate
+        description: Climate zone for the location (Bass Pro specific)
+        expr: CLIMATE
+        data_type: TEXT
+      - name: banner
+        description: Foot Locker banner brand (Foot Locker, Kids Foot Locker, Champs Sports)
+        expr: BANNER
+        data_type: TEXT
+      - name: store_classification
+        description: Store tier classification
+        expr: STORE_CLASSIFICATION
+        data_type: TEXT
+      - name: store_size
+        description: Store size category
+        expr: STORE_SIZE
+        data_type: TEXT
+
+  - name: items
+    description: >
+      Product/SKU master data with category, style, brand, and pricing. Items are shared
+      across retailers but may have retailer-specific attributes like URBN short SKUs.
+    base_table:
+      database: SPS_RETAIL_AI
+      schema: SHARED
+      table: ITEM
+    dimensions:
+      - name: item_id
+        description: Unique item/SKU identifier
+        expr: ITEM_ID
+        data_type: TEXT
+      - name: retailer_id
+        description: Retailer this item belongs to
+        expr: RETAILER_ID
+        data_type: TEXT
+      - name: category_name
+        description: Product category (Footwear, Apparel, Accessories, etc.)
+        expr: CATEGORY_NAME
+        data_type: TEXT
+      - name: product_group_name
+        description: Product group within the category
+        expr: PRODUCT_GROUP_NAME
+        data_type: TEXT
+      - name: gender
+        description: Target gender for the product
+        expr: GENDER
+        data_type: TEXT
+      - name: style_number
+        description: Style number identifier
+        expr: STYLE_NUMBER
+        data_type: TEXT
+      - name: color_name
+        description: Product color
+        expr: COLOR_NAME
+        data_type: TEXT
+      - name: size_name
+        description: Product size
+        expr: SIZE_NAME
+        data_type: TEXT
+      - name: brand_name
+        description: Brand name
+        expr: BRAND_NAME
+        data_type: TEXT
+      - name: department_name
+        description: Retailer department
+        expr: DEPARTMENT_NAME
+        data_type: TEXT
+      - name: product_season
+        description: Season the product is intended for (Spring, Summer, Fall, Winter, Year-Round)
+        expr: PRODUCT_SEASON
+        data_type: TEXT
+    facts:
+      - name: msrp
+        description: Manufacturer suggested retail price in dollars
+        expr: MSRP
+        data_type: NUMBER
+      - name: cost
+        description: Wholesale cost per unit in dollars
+        expr: COST
+        data_type: NUMBER
+
+  - name: fulfillment_predictions
+    description: >
+      ML-predicted fulfillment risk from SNOWFLAKE.ML.CLASSIFICATION model. Combines
+      PO features with supplier and location attributes to predict whether an order
+      will be late or short (IS_LATE_OR_SHORT). Includes historical OTIF rates.
+    base_table:
+      database: SPS_RETAIL_AI
+      schema: ML_MODELS
+      table: FULFILLMENT_PREDICTIONS
+    dimensions:
+      - name: pred_po_id
+        description: Purchase order ID for this prediction
+        expr: PO_ID
+        data_type: TEXT
+      - name: pred_retailer_id
+        description: Retailer ID for this prediction
+        expr: RETAILER_ID
+        data_type: TEXT
+      - name: pred_supplier_id
+        description: Supplier ID for this prediction
+        expr: SUPPLIER_ID
+        data_type: TEXT
+      - name: supplier_region
+        description: Supplier geographic region used as ML feature
+        expr: SUPPLIER_REGION
+        data_type: TEXT
+      - name: destination_region
+        description: Destination store region used as ML feature
+        expr: DESTINATION_REGION
+        data_type: TEXT
+      - name: destination_size
+        description: Destination store size used as ML feature
+        expr: DESTINATION_SIZE
+        data_type: TEXT
+      - name: location_type
+        description: Destination location type (STORE or DC) used as ML feature
+        expr: LOCATION_TYPE
+        data_type: TEXT
+      - name: is_replacement_850
+        description: Whether this was a replacement PO used as ML feature
+        expr: IS_REPLACEMENT_850
+        data_type: BOOLEAN
+      - name: is_late_or_short
+        description: Actual outcome label (1 = late or short, 0 = on-time and in-full)
+        expr: IS_LATE_OR_SHORT
+        data_type: NUMBER
+    facts:
+      - name: predicted_risk_score
+        description: "ML model predicted risk class (0 = low risk / on-time, 1 = high risk / late or short). Extracted from PREDICTION variant column."
+        expr: 'PREDICTION:"class"::INT'
+        data_type: NUMBER
+      - name: pred_total_units
+        description: Total PO units used as ML feature
+        expr: TOTAL_UNITS
+        data_type: NUMBER
+      - name: pred_total_cost
+        description: Total PO cost used as ML feature
+        expr: TOTAL_COST
+        data_type: NUMBER
+      - name: supplier_avg_lead
+        description: Supplier average lead time in days
+        expr: SUPPLIER_AVG_LEAD
+        data_type: NUMBER
+      - name: supplier_lead_var
+        description: Supplier lead time variability
+        expr: SUPPLIER_LEAD_VAR
+        data_type: NUMBER
+      - name: days_to_deliver
+        description: Actual days from order to delivery
+        expr: DAYS_TO_DELIVER
+        data_type: NUMBER
+      - name: days_to_ship
+        description: Actual days from order to shipment
+        expr: DAYS_TO_SHIP
+        data_type: NUMBER
+      - name: line_count
+        description: Number of line items on the PO
+        expr: LINE_COUNT
+        data_type: NUMBER
+      - name: total_line_qty
+        description: Total quantity across all PO lines
+        expr: TOTAL_LINE_QTY
+        data_type: NUMBER
+      - name: distinct_items
+        description: Number of distinct items/SKUs on the PO
+        expr: DISTINCT_ITEMS
+        data_type: NUMBER
+      - name: hist_on_time_rate
+        description: Historical on-time delivery rate for this supplier-retailer pair
+        expr: HIST_ON_TIME_RATE
+        data_type: NUMBER
+      - name: hist_in_full_rate
+        description: Historical in-full delivery rate for this supplier-retailer pair
+        expr: HIST_IN_FULL_RATE
+        data_type: NUMBER
+      - name: hist_otif_rate
+        description: Historical OTIF (on-time in-full) rate for this supplier-retailer pair
+        expr: HIST_OTIF_RATE
+        data_type: NUMBER
+      - name: hist_avg_days_late
+        description: Historical average days late for this supplier-retailer pair
+        expr: HIST_AVG_DAYS_LATE
+        data_type: NUMBER
+      - name: hist_po_count
+        description: Historical PO count for this supplier-retailer pair
+        expr: HIST_PO_COUNT
+        data_type: NUMBER
+      - name: order_dow
+        description: Day of week the order was placed (0=Monday, 6=Sunday)
+        expr: ORDER_DOW
+        data_type: NUMBER
+      - name: order_month
+        description: Month the order was placed (1-12)
+        expr: ORDER_MONTH
+        data_type: NUMBER
+
+# Relationships define how tables join
+relationships:
+  - name: po_to_retailer
+    left_table: purchase_orders
+    right_table: retailers
+    relationship_columns:
+      - left_column: retailer_id
+        right_column: retailer_id
+    join_type: inner
+    relationship_type: many_to_one
+
+  - name: po_to_supplier
+    left_table: purchase_orders
+    right_table: suppliers
+    relationship_columns:
+      - left_column: supplier_id
+        right_column: supplier_id
+    join_type: inner
+    relationship_type: many_to_one
+
+  - name: po_to_location
+    left_table: purchase_orders
+    right_table: locations
+    relationship_columns:
+      - left_column: ship_to_location_id
+        right_column: location_id
+    join_type: inner
+    relationship_type: many_to_one
+
+  - name: shipment_to_po
+    left_table: shipments
+    right_table: purchase_orders
+    relationship_columns:
+      - left_column: po_id
+        right_column: po_id
+    join_type: inner
+    relationship_type: many_to_one
+
+  - name: receipt_to_shipment
+    left_table: receipts
+    right_table: shipments
+    relationship_columns:
+      - left_column: shipment_id
+        right_column: shipment_id
+    join_type: inner
+    relationship_type: one_to_one
+
+  - name: receipt_to_po
+    left_table: receipts
+    right_table: purchase_orders
+    relationship_columns:
+      - left_column: po_id
+        right_column: po_id
+    join_type: inner
+    relationship_type: many_to_one
+
+  - name: invoice_to_po
+    left_table: invoices
+    right_table: purchase_orders
+    relationship_columns:
+      - left_column: po_id
+        right_column: po_id
+    join_type: inner
+    relationship_type: many_to_one
+
+  - name: invoice_to_shipment
+    left_table: invoices
+    right_table: shipments
+    relationship_columns:
+      - left_column: shipment_id
+        right_column: shipment_id
+    join_type: inner
+    relationship_type: one_to_one
+
+  - name: invoice_to_supplier
+    left_table: invoices
+    right_table: suppliers
+    relationship_columns:
+      - left_column: supplier_id
+        right_column: supplier_id
+    join_type: inner
+    relationship_type: many_to_one
+
+  - name: po_line_to_po
+    left_table: po_lines
+    right_table: purchase_orders
+    relationship_columns:
+      - left_column: po_id
+        right_column: po_id
+    join_type: inner
+    relationship_type: many_to_one
+
+  - name: po_line_to_item
+    left_table: po_lines
+    right_table: items
+    relationship_columns:
+      - left_column: item_id
+        right_column: item_id
+    join_type: inner
+    relationship_type: many_to_one
+
+  - name: prediction_to_po
+    left_table: fulfillment_predictions
+    right_table: purchase_orders
+    relationship_columns:
+      - left_column: pred_po_id
+        right_column: po_id
+    join_type: inner
+    relationship_type: one_to_one
+
+  - name: prediction_to_retailer
+    left_table: fulfillment_predictions
+    right_table: retailers
+    relationship_columns:
+      - left_column: pred_retailer_id
+        right_column: retailer_id
+    join_type: inner
+    relationship_type: many_to_one
+
+  - name: shipment_to_retailer
+    left_table: shipments
+    right_table: retailers
+    relationship_columns:
+      - left_column: retailer_id
+        right_column: retailer_id
+    join_type: inner
+    relationship_type: many_to_one
+
+  - name: invoice_to_retailer
+    left_table: invoices
+    right_table: retailers
+    relationship_columns:
+      - left_column: retailer_id
+        right_column: retailer_id
+    join_type: inner
+    relationship_type: many_to_one
+
+# Verified queries for Cortex Analyst to learn from
+verified_queries:
+  - name: vqr_0
+    question: What is the OTIF rate for each retailer?
+    sql: |
+      SELECT
+        r.RETAILER_NAME,
+        COUNT(DISTINCT s.SHIPMENT_ID) AS total_shipments,
+        ROUND(AVG(CASE WHEN s.ON_TIME_FLAG THEN 1 ELSE 0 END) * 100, 1) AS on_time_pct,
+        ROUND(AVG(CASE WHEN s.IN_FULL_FLAG THEN 1 ELSE 0 END) * 100, 1) AS in_full_pct,
+        ROUND(AVG(CASE WHEN s.ON_TIME_FLAG AND s.IN_FULL_FLAG THEN 1 ELSE 0 END) * 100, 1) AS otif_pct
+      FROM SPS_RETAIL_AI.SHARED.SHIPMENT s
+      JOIN SPS_RETAIL_AI.SHARED.RETAILER r ON s.RETAILER_ID = r.RETAILER_ID
+      GROUP BY r.RETAILER_NAME
+      ORDER BY otif_pct DESC
+
+  - name: vqr_1
+    question: Which suppliers have the highest risk of late or short deliveries?
+    sql: |
+      SELECT
+        sup.SUPPLIER_NAME,
+        sup.REGION AS supplier_region,
+        sup.RELIABILITY_TIER,
+        COUNT(*) AS total_predictions,
+        SUM(fp.PREDICTION:"class"::INT) AS predicted_at_risk,
+        ROUND(SUM(fp.PREDICTION:"class"::INT)::FLOAT / COUNT(*) * 100, 1) AS risk_rate_pct
+      FROM SPS_RETAIL_AI.ML_MODELS.FULFILLMENT_PREDICTIONS fp
+      JOIN SPS_RETAIL_AI.SHARED.SUPPLIER sup ON fp.SUPPLIER_ID = sup.SUPPLIER_ID
+      GROUP BY sup.SUPPLIER_NAME, sup.REGION, sup.RELIABILITY_TIER
+      ORDER BY risk_rate_pct DESC
+      LIMIT 10
+
+  - name: vqr_2
+    question: What is the invoice mismatch rate by retailer?
+    sql: |
+      SELECT
+        r.RETAILER_NAME,
+        COUNT(i.INVOICE_ID) AS total_invoices,
+        SUM(CASE WHEN i.MISMATCH_FLAG THEN 1 ELSE 0 END) AS mismatched_invoices,
+        ROUND(SUM(CASE WHEN i.MISMATCH_FLAG THEN 1 ELSE 0 END)::FLOAT / NULLIF(COUNT(i.INVOICE_ID), 0) * 100, 1) AS mismatch_rate_pct
+      FROM SPS_RETAIL_AI.SHARED.INVOICE i
+      JOIN SPS_RETAIL_AI.SHARED.RETAILER r ON i.RETAILER_ID = r.RETAILER_ID
+      GROUP BY r.RETAILER_NAME
+      ORDER BY mismatch_rate_pct DESC
+
+  - name: vqr_3
+    question: What are the top product categories by total order value across all retailers?
+    sql: |
+      SELECT
+        it.CATEGORY_NAME,
+        r.RETAILER_NAME,
+        COUNT(DISTINCT pl.PO_ID) AS po_count,
+        SUM(pl.LINE_TOTAL) AS total_order_value,
+        SUM(pl.ORDERED_QTY) AS total_units_ordered
+      FROM SPS_RETAIL_AI.SHARED.PO_LINE pl
+      JOIN SPS_RETAIL_AI.SHARED.ITEM it ON pl.ITEM_ID = it.ITEM_ID
+      JOIN SPS_RETAIL_AI.SHARED.PURCHASE_ORDER po ON pl.PO_ID = po.PO_ID
+      JOIN SPS_RETAIL_AI.SHARED.RETAILER r ON po.RETAILER_ID = r.RETAILER_ID
+      GROUP BY it.CATEGORY_NAME, r.RETAILER_NAME
+      ORDER BY total_order_value DESC
+
+  - name: vqr_4
+    question: How does the ML model accuracy compare across retailers?
+    sql: |
+      SELECT
+        r.RETAILER_NAME,
+        COUNT(*) AS total_predictions,
+        SUM(CASE WHEN fp.PREDICTION:"class"::INT = fp.IS_LATE_OR_SHORT THEN 1 ELSE 0 END) AS correct_predictions,
+        ROUND(SUM(CASE WHEN fp.PREDICTION:"class"::INT = fp.IS_LATE_OR_SHORT THEN 1 ELSE 0 END)::FLOAT / COUNT(*) * 100, 1) AS accuracy_pct
+      FROM SPS_RETAIL_AI.ML_MODELS.FULFILLMENT_PREDICTIONS fp
+      JOIN SPS_RETAIL_AI.SHARED.RETAILER r ON fp.RETAILER_ID = r.RETAILER_ID
+      GROUP BY r.RETAILER_NAME
+      ORDER BY accuracy_pct DESC
