@@ -725,7 +725,7 @@ After completing all steps, verify:
 - [ ] Each retailer's `V_PURCHASE_ORDERS` and `V_WEEKLY_ACTIVITY` views return data
 - [ ] `FULFILLMENT_RISK_MODEL` exists: `SHOW SNOWFLAKE.ML.CLASSIFICATION;`
 - [ ] `FULFILLMENT_PREDICTIONS` table has 9,919 rows with non-null predictions
-- [ ] All 5 Streamlit apps are accessible from Snowsight
+- [ ] All 6 Streamlit apps are accessible from Snowsight
 
 ---
 
@@ -744,12 +744,13 @@ sps_retail_fulfillment_intelligence/
 │   ├── BASSPRO_DATAMODEL.md
 │   └── URBANOUTFITTERS_DATAMODEL.md
 │
-├── apps/                           ← 5 Streamlit dashboard source files
+├── apps/                           ← 6 Streamlit dashboard source files
 │   ├── sps_fulfillment_intelligence.py
 │   ├── sps_foot_locker.py
 │   ├── sps_bass_pro.py
 │   ├── sps_urban_outfitters.py
-│   └── sps_partner_value_lab.py
+│   ├── sps_partner_value_lab.py
+│   └── sps_performance_manager.py
 │
 ├── data/                           ← All datasets as CSV
 │   ├── shared/                     ← 11 tables (retailer, supplier, item, ...)
@@ -809,7 +810,7 @@ snow sql -f setup/05_streamlit_apps.sql --connection coco_conn
 | Document | Description |
 |---|---|
 | [SETUP.md](SETUP.md) | Complete replication guide with verification steps |
-| [DEMO_TALK_TRACK.md](DEMO_TALK_TRACK.md) | Presenter script: executive opening → 5 dashboards → closing |
+| [DEMO_TALK_TRACK.md](DEMO_TALK_TRACK.md) | Presenter script: executive opening → 6 dashboards → closing |
 | [SPS_DATAMODEL.md](datamodels/SPS_DATAMODEL.md) | SPS Commerce data model (EDI documents + activity feed) |
 | [FOOTLOCKER_DATAMODEL.md](datamodels/FOOTLOCKER_DATAMODEL.md) | Foot Locker data model (banners, sizes, launches) |
 | [BASSPRO_DATAMODEL.md](datamodels/BASSPRO_DATAMODEL.md) | Bass Pro Shops data model (seasons, regions, climate) |

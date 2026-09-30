@@ -10,7 +10,7 @@
 |-------|-------|
 | **Event** | *(fill in before presenting)* |
 | **Presenter** | *(fill in before presenting)* |
-| **Duration** | ~25 min full run; each retailer section 5-6 min standalone |
+| **Duration** | ~30 min full run; each retailer section 5-6 min standalone |
 | **Database** | `SPS_RETAIL_AI` on `sfsenorthamerica-demo_vsuru` |
 | **Audience** | Retail data leaders, supply chain teams, SPS Commerce partners |
 
@@ -39,7 +39,7 @@
 >
 > "By joining SPS EDI transaction data with retailer operational data inside Snowflake, we create a unified fulfillment picture — and train a machine learning model that predicts delivery problems before they happen."
 >
-> "Today I'll walk you through what this data join looks like across three very different retailers — Foot Locker, Bass Pro Shops, and Urban Outfitters — and show you the AI value that only exists when both sides of the supply chain come together."
+> "Today I'll walk you through what this data join looks like across three very different retailers — Foot Locker, Bass Pro Shops, and Urban Outfitters — show you the AI value that only exists when both sides of the supply chain come together, and close with an executive performance dashboard powered by four Snowflake ML/AI features."
 
 ---
 
@@ -52,6 +52,7 @@
 | 3 | SPS + Bass Pro Shops | 5 min | Seasonal availability |
 | 4 | SPS + Urban Outfitters | 5 min | PO revision and SKU readiness |
 | 5 | SPS Partner Value Lab | 4 min | The value proof |
+| 6 | SPS Performance Manager | 5 min | Executive KPIs + Snowflake ML/AI showcase |
 
 ---
 
@@ -215,13 +216,51 @@
 
 ---
 
+## Dashboard 6: SPS Performance Manager (5 min)
+
+### What you see
+- Sales/Margin Impact KPIs: not-received product costs, invoice mismatch costs, delayed sales impact
+- Operating Expense Impact KPIs: late receipt costs, early receipt costs, order change costs
+- Overall Performance score with letter grade (A/B/C) gauge and 4 KPI cards with month-over-month deltas
+- Performance trend chart with ML Forecast (6-month prediction with confidence bands) and Anomaly Detection markers
+- ML-predicted fulfillment risk by retailer (from Classification model)
+- AI-generated executive summary narrative (Cortex LLM)
+
+### The story to tell
+
+> "This is the executive operations view — modeled after the real SPS Commerce Performance Manager dashboard. But we've added four Snowflake ML and AI capabilities on top."
+>
+> "First, the ML Forecast predicts where on-time rates are heading over the next six months — the dashed line with the confidence band. Second, Anomaly Detection automatically flags months where performance deviated from the expected pattern — the diamond markers."
+>
+> "Third, the Classification model from Dashboard 1 scores every PO for risk. And fourth, at the bottom, Cortex AI writes a dynamic executive summary that updates every time you change the retailer or month filter. It's not a template — it's an LLM reading the actual numbers and generating insight."
+
+### Point out
+- The dollar-impact KPIs — translate delivery failures into financial terms that executives understand
+- The forecast confidence band — shows the range of expected outcomes, not just a single prediction
+- The AI summary changing when you switch retailers — demonstrates real-time LLM integration
+- Four distinct Snowflake ML/AI features in one dashboard: FORECAST, ANOMALY_DETECTION, CLASSIFICATION, CORTEX.COMPLETE
+
+### Data sources
+
+| Dashboard Element | Snowflake Tables/Views |
+|-------------------|----------------------|
+| Sales/Margin Impact | `SHARED.V_MONTHLY_PERFORMANCE` (NOT_RECEIVED_COST, MISMATCH_DOLLAR_VALUE, DELAYED_SALES_IMPACT) |
+| Operating Expense Impact | `SHARED.V_MONTHLY_PERFORMANCE` (LATE_RECEIPT_COST, EARLY_RECEIPT_COST, ORDER_CHANGE_COST) |
+| Overall Score + KPI cards | `SHARED.V_MONTHLY_PERFORMANCE` (OVERALL_SCORE, ON_TIME_RATE, FILL_RATE, etc.) |
+| Trend + Forecast | `ML_MODELS.OTIF_FORECAST_MODEL!FORECAST()` + `SHARED.V_MONTHLY_PERFORMANCE` |
+| Anomaly Detection | `ML_MODELS.PERFORMANCE_ANOMALY_MODEL!DETECT_ANOMALIES()` |
+| ML Risk | `ML_MODELS.FULFILLMENT_PREDICTIONS` |
+| AI Summary | `SNOWFLAKE.CORTEX.COMPLETE('mistral-large2', ...)` |
+
+---
+
 ## Closing (1 min)
 
 > "The ML model's top features — order value, lead time, supplier history — all come from the joined SPS-plus-retailer dataset. No single system has these signals alone. This is the data join creating AI value."
 >
 > "SPS Commerce brings the transaction network. Each retailer brings their operational context — banners, climate zones, SKU systems, revision workflows. Snowflake is where these come together, and Snowflake ML turns that joined data into predictions that help suppliers ship smarter."
 >
-> "The dashboards you saw today are live on the data. Every chart queries the same tables and views the model was trained on. This isn't a slide deck — it's a working system."
+> "The dashboards you saw today are live on the data. Every chart queries the same tables and views the model was trained on. The Performance Manager dashboard alone uses four Snowflake ML/AI capabilities — Forecast, Anomaly Detection, Classification, and Cortex LLM. This isn't a slide deck — it's a working system."
 
 ---
 
@@ -239,7 +278,7 @@
 **If running a short version (10-15 min):**
 - Open with Dashboard 1 (SPS Fulfillment Intelligence) for the full story
 - Pick ONE retailer dashboard to show the data-join depth
-- Close with Dashboard 5 (Partner Value Lab) for the value proof
+- Close with Dashboard 6 (Performance Manager) for the ML/AI showcase
 
 **If running a single-retailer spotlight (5-6 min):**
 - Go directly to the retailer dashboard

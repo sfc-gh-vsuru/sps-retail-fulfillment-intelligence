@@ -22,7 +22,7 @@ Neither side alone can answer the question that matters most:
 
 ## The Solution
 
-Join SPS Commerce's EDI transaction data with each retailer's operational data inside Snowflake. Train a machine learning model on the combined dataset. Deploy five interactive dashboards that turn predictions into action.
+Join SPS Commerce's EDI transaction data with each retailer's operational data inside Snowflake. Train a machine learning model on the combined dataset. Deploy six interactive dashboards that turn predictions into action.
 
 ![architecture](images/architecture_solution.jpeg)
 
@@ -120,6 +120,18 @@ The value proof. Compares ML model accuracy across all three retailers and shows
 
 ---
 
+### 6. SPS Performance Manager
+
+The executive operations dashboard — modeled after SPS Commerce's Performance Manager. Shows dollar-impact KPIs (not-received costs, late receipt penalties, invoice mismatches), an overall performance score with letter grade, and monthly trend lines with ML-generated forecasts and anomaly detection. Includes an AI-generated executive narrative summary that updates with every filter change.
+
+**Snowflake ML/AI features used:**
+- **ML.FORECAST** — 6-month OTIF trend prediction with confidence intervals
+- **ML.ANOMALY_DETECTION** — Flags unusual performance months
+- **ML.CLASSIFICATION** — Fulfillment risk predictions
+- **CORTEX.COMPLETE** — AI-generated executive summary narrative
+
+---
+
 ## The Data Join Story
 
 Every chart in every dashboard is powered by a join between SPS Commerce data and retailer data. Neither dataset alone can produce these insights.
@@ -142,7 +154,10 @@ Every chart in every dashboard is powered by a join between SPS Commerce data an
 | **`SNOWFLAKE.ML.CLASSIFICATION`** | Trains a fulfillment risk model on 9,919 POs with 22 features from the joined dataset. Predicts `IS_LATE_OR_SHORT` (0/1). |
 | **`SHOW_FEATURE_IMPORTANCE()`** | Reveals which data points drive predictions — order value, lead time, and supplier OTIF history are the top signals. |
 | **`!PREDICT()`** | Scores every PO in real-time. The PREDICTION variant column contains class and probability for each order. |
-| **Streamlit in Snowflake** | 5 dashboards deployed natively — no external compute, no container runtime, instant load. |
+| **`SNOWFLAKE.ML.FORECAST`** | Predicts OTIF trend 6 months ahead with confidence intervals — used in the Performance Manager dashboard. |
+| **`SNOWFLAKE.ML.ANOMALY_DETECTION`** | Flags months with unusual performance dips — used in the Performance Manager dashboard. |
+| **`SNOWFLAKE.CORTEX.COMPLETE`** | AI-generated executive narrative summary that updates dynamically with filter changes. |
+| **Streamlit in Snowflake** | 6 dashboards deployed natively — no external compute, no container runtime, instant load. |
 
 ### Model Performance
 
@@ -175,7 +190,7 @@ Every chart in every dashboard is powered by a join between SPS Commerce data an
 
 ## Summary
 
-This project demonstrates how **SPS Commerce EDI data** — purchase orders, shipments, invoices, and weekly activity feeds — becomes dramatically more valuable when joined with **retailer-specific operational data** inside Snowflake. The combined dataset powers a **SNOWFLAKE.ML.CLASSIFICATION** model that predicts fulfillment risk at 91.3% accuracy across 9,919 POs, and five native **Streamlit in Snowflake** dashboards turn those predictions into actionable insights for supply chain teams. From OTIF tracking to invoice mismatch detection to size-level availability analysis, every chart is built on data that neither SPS Commerce nor the retailer could produce alone.
+This project demonstrates how **SPS Commerce EDI data** — purchase orders, shipments, invoices, and weekly activity feeds — becomes dramatically more valuable when joined with **retailer-specific operational data** inside Snowflake. The combined dataset powers a **SNOWFLAKE.ML.CLASSIFICATION** model that predicts fulfillment risk at 91.3% accuracy across 9,919 POs, and six native **Streamlit in Snowflake** dashboards — including one powered by four distinct Snowflake ML/AI features (Forecast, Anomaly Detection, Classification, and Cortex LLM) — turn those predictions into actionable insights for supply chain teams. From OTIF tracking to invoice mismatch detection to size-level availability analysis, every chart is built on data that neither SPS Commerce nor the retailer could produce alone.
 
 > See [SETUP.md](SETUP.md) for full replication instructions and [DEMO_TALK_TRACK.md](DEMO_TALK_TRACK.md) for a presenter walk-through.
 
@@ -183,6 +198,6 @@ This project demonstrates how **SPS Commerce EDI data** — purchase orders, shi
 
 <div align="center">
 
-*Built on Snowflake — Data Cloud, ML Classification, Streamlit in Snowflake*
+*Built on Snowflake — Data Cloud, ML Classification, ML Forecast, Anomaly Detection, Cortex AI, Streamlit in Snowflake*
 
 </div>
