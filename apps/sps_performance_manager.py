@@ -22,12 +22,13 @@ with col_f2:
     months_df = session.sql(
         "SELECT DISTINCT MONTH_DATE FROM SPS_RETAIL_AI.SHARED.V_MONTHLY_PERFORMANCE WHERE MONTH_DATE < '2024-08-01' ORDER BY MONTH_DATE DESC"
     ).to_pandas()
+    months_df["MONTH_DATE"] = pd.to_datetime(months_df["MONTH_DATE"])
     month_options = months_df["MONTH_DATE"].dt.strftime("%B %Y").tolist()
     selected_month_label = st.selectbox("Month", month_options)
 
 # Parse selection
 selected_month_date = months_df.iloc[month_options.index(selected_month_label)]["MONTH_DATE"]
-month_str = pd.Timestamp(selected_month_date).strftime("%Y-%m-%d")
+month_str = selected_month_date.strftime("%Y-%m-%d")
 
 retailer_filter = ""
 if selected_retailer != "All Retailers":
@@ -313,19 +314,19 @@ st.divider()
 st.subheader("ML-Predicted Fulfillment Risk")
 st.caption("SNOWFLAKE.ML.CLASSIFICATION model — 91.3% accuracy on 9,919 POs")
 
-risk_df = session.sql(f"""
-    SELECT
-        r.RETAILER_NAME,
-        SUM(CASE WHEN fp.PREDICTION:'class'::INT = 1 THEN 1 ELSE 0 END) AS AT_RISK,
-        SUM(CASE WHEN fp.PREDICTION:'class'::INT = 0 THEN 1 ELSE 0 END) AS ON_TRACK,
-        COUNT(*) AS TOTAL,
-        ROUND(SUM(CASE WHEN fp.PREDICTION:'class'::INT = 1 THEN 1 ELSE 0 END)::FLOAT / COUNT(*) * 100, 1) AS RISK_PCT
-    FROM SPS_RETAIL_AI.ML_MODELS.FULFILLMENT_PREDICTIONS fp
-    JOIN SPS_RETAIL_AI.SHARED.RETAILER r ON fp.RETAILER_ID = r.RETAILER_ID
-    {"WHERE r.RETAILER_NAME = '" + selected_retailer + "'" if selected_retailer != 'All Retailers' else ''}
-    GROUP BY r.RETAILER_NAME
-    ORDER BY RISK_PCT DESC
-""").to_pandas()
+risk_where = f"WHERE r.RETAILER_NAME = '{selected_retailer}'" if selected_retailer != "All Retailers" else ""
+risk_sql = (
+    'SELECT r.RETAILER_NAME, '
+    'SUM(CASE WHEN fp.PREDICTION:"class"::INT = 1 THEN 1 ELSE 0 END) AS AT_RISK, '
+    'SUM(CASE WHEN fp.PREDICTION:"class"::INT = 0 THEN 1 ELSE 0 END) AS ON_TRACK, '
+    'COUNT(*) AS TOTAL, '
+    'ROUND(SUM(CASE WHEN fp.PREDICTION:"class"::INT = 1 THEN 1 ELSE 0 END)::FLOAT / COUNT(*) * 100, 1) AS RISK_PCT '
+    'FROM SPS_RETAIL_AI.ML_MODELS.FULFILLMENT_PREDICTIONS fp '
+    'JOIN SPS_RETAIL_AI.SHARED.RETAILER r ON fp.RETAILER_ID = r.RETAILER_ID '
+    f'{risk_where} '
+    'GROUP BY r.RETAILER_NAME ORDER BY RISK_PCT DESC'
+)
+risk_df = session.sql(risk_sql).to_pandas()
 
 rc1, rc2 = st.columns([1, 2])
 with rc1:
