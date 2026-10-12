@@ -89,16 +89,18 @@
 
 **Show:** `http://localhost:8501` (SPS PO Risk Checker)
 
-> "This app is running on my laptop, not in Snowflake. It's one Python file."
+> "This app is running on my laptop, not in Snowflake. It's one Python file. It's written for a business user: the top explains the problem and the three steps, every input has a hover tip, and the results say what to do."
 
-1. **Low risk.** Select `PO_007447 · Low risk · retailer BP` and click **Score this PO**.
-   > "1% risk, green. Cortex says why: this supplier has a strong history with this retailer and the shipment is moving well ahead of schedule."
-2. **High risk.** Select `PO_008398 · High risk · retailer FL` and click **Score this PO**.
-   > "Near 100%, red. The explanation points to the delivery window running short of the supplier's typical lead time, and suggests a concrete action: expedite or renegotiate the date."
-3. **What-if.** On the high-risk PO, lower **Days in transit** (for example, from 11 to 3) and re-score.
-   > "Change one input and the score responds immediately. This is what a supplier portal or a receiving-dock tool would do in real time."
-4. **Over the wire.** Expand **What went over the wire**.
-   > "Here's exactly what was sent: a small JSON payload of PO attributes. And here's what came back: two probabilities. The app never touched a table. It only sees the score."
+1. **Low risk.** Select `Bass Pro Shops · PO_007447 · low risk example`. Read the order summary card aloud (units, value, supplier history, what actually happened), then click **Score this order**.
+   > "1% chance of arriving late or short, 17 points below a typical order. Green, no action needed. Cortex says why: this supplier has a strong history with this retailer and the shipment is moving well ahead of schedule."
+2. **High risk.** Select `Foot Locker · PO_008398 · high risk example` and click **Score this order**.
+   > "Near 100%, red, act now. The explanation points to the delivery window running short of the supplier's typical lead time, and suggests a concrete action: expedite or renegotiate the date. In history, this order was in fact late."
+3. **What-if.** On the high-risk order, lower **Days in transit** from 11 to 3 and re-score.
+   > "Change one input and the score drops from 100% to about 23%, from High to Watch. The app flags that we're now in what-if mode. This is what a supplier portal or a receiving-dock tool would do in real time."
+4. **How to read it.** Open **How to read the score**.
+   > "Plain-language bands, the typical-order baseline, and how often the model is right, so a business user knows how much to trust it."
+5. **Behind the scenes.** Open **Behind the scenes (technical)**.
+   > "For the technical audience: exactly what was sent, a small JSON payload of order details, and what came back, two probabilities. Response times are shown. The app never touched a table. It only sees the score."
 
 ---
 
@@ -121,7 +123,7 @@
 ## Short Version (2 min)
 
 1. Run `test_inference.py` (45 s): "two HTTPS calls, a score and an explanation."
-2. In the app, score the high-risk PO and expand "What went over the wire" (60 s).
+2. In the app, score the high-risk order, change days in transit to 3 and re-score, then open "Behind the scenes" (60 s).
 3. One governance sentence (15 s).
 
 ---

@@ -176,7 +176,14 @@ Then run the app:
 .venv/bin/streamlit run app_streamlit.py    # http://localhost:8501
 ```
 
-Score one low-risk and one high-risk sample. You should see the risk %, a color label, the AI explanation, and the raw request/response.
+Score one low-risk and one high-risk sample. You should see:
+- the order summary card;
+- the risk % compared with a typical order;
+- a Low/Watch/High label with a recommended action;
+- the AI explanation;
+- the request and response under "Behind the scenes."
+
+For a what-if check, set **Days in transit** to 3 on the high-risk Foot Locker sample. The score should drop to about 23% (Watch).
 
 ---
 

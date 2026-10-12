@@ -71,7 +71,7 @@ The baseline was checked before and after the build: row counts, objects in `ML_
 | `score_client.py` | **Shared client**: `score()` for the inference endpoint and `explain()` for Cortex REST. Pure `requests` |
 | `sample_requests.json` | 6 demo POs (3 low risk, 3 high risk), so the app needs no database access |
 | `test_inference.py` | Command-line test of both REST APIs |
-| `app_streamlit.py` | Local "SPS PO Risk Checker" app |
+| `app_streamlit.py` | Local "SPS PO Risk Checker" app, written for business users: plain-language intro, order summary, input tooltips, risk bands with recommended actions, AI explanation, glossary, and a technical "behind the scenes" panel |
 | `.env.example` | Config template. Copy it to `.env` (gitignored) |
 | `99_teardown.sql` | Rollback |
 
