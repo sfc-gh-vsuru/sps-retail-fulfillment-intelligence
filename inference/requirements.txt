@@ -1,0 +1,10 @@
+snowflake-ml-python>=1.25.0
+snowflake-snowpark-python
+xgboost==3.2.0
+scikit-learn==1.7.2
+numba
+tomli
+pandas
+requests
+python-dotenv
+streamlit

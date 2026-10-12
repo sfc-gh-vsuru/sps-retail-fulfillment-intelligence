@@ -1,0 +1,4 @@
+# Inference add-on: local secrets and environment
+.env
+.venv/
+!.env.example
