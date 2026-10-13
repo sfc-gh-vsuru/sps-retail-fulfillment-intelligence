@@ -27,7 +27,8 @@ The main project docs (`../README.md`, `../SETUP.md`, `../DEMO_TALK_TRACK.md`) a
 ```
 ┌──────────── Your laptop ────────────┐          ┌───────────────────── Snowflake ─────────────────────┐
 │                                     │  HTTPS   │                                                     │
-│  app_streamlit.py  (localhost:8501) │──+ PAT──▶│  FULFILLMENT_RISK_SVC   POST /predict-proba         │
+│  web/ React app    (localhost:3000) │──+ PAT──▶│  FULFILLMENT_RISK_SVC   POST /predict-proba         │
+│  app_streamlit.py  (localhost:8501) │          │                                                     │
 │  test_inference.py                  │          │  (SPCS · Model Registry: FULFILLMENT_RISK_XGB V2)   │
 │        │                            │          │                                                     │
 │        └── score_client.py ─────────│──+ PAT──▶│  Cortex REST API  POST /api/v2/cortex/v1/           │
@@ -69,9 +70,10 @@ The baseline was checked before and after the build: row counts, objects in `ML_
 | `01_train_register.py` | Trains XGBoost, logs `FULFILLMENT_RISK_XGB` to the Model Registry, writes `SAMPLE_REQUESTS` |
 | `02_create_service.py` | Deploys the model with `mv.create_service(ingress_enabled=True)` |
 | `score_client.py` | **Shared client**: `score()` for the inference endpoint and `explain()` for Cortex REST. Pure `requests` |
-| `sample_requests.json` | 6 demo POs (3 low risk, 3 high risk), so the app needs no database access |
+| `sample_requests.json` | Export of `SAMPLE_REQUESTS`: 6 demo POs (3 low risk, 3 high risk) used by `test_inference.py` and the Streamlit app (the web app reads the table live) |
 | `test_inference.py` | Command-line test of both REST APIs |
-| `app_streamlit.py` | Local "SPS PO Risk Checker" app, written for business users: plain-language intro, order summary, input tooltips, risk bands with recommended actions, AI explanation, glossary, and a technical "behind the scenes" panel |
+| `web/` | **Primary demo app.** "SPS PO Risk Checker" in Next.js + shadcn/ui + lucide icons: risk gauge, colored Low/Watch/High badges, arrows against the typical order and for what-if changes, AI explanation, technical panel. See [Web App](#web-app-react) |
+| `app_streamlit.py` | Same app in one Python file (alternative if Node isn't available). Uses `score_client.py` and `sample_requests.json` |
 | `.env.example` | Config template. Copy it to `.env` (gitignored) |
 | `99_teardown.sql` | Rollback |
 
@@ -90,8 +92,33 @@ SNOWFLAKE_CONNECTION_NAME=coco_conn .venv/bin/python 01_train_register.py      #
 SNOWFLAKE_CONNECTION_NAME=coco_conn .venv/bin/python 02_create_service.py      # SPCS endpoint (~7-10 min)
 cp .env.example .env    # set INFERENCE_URL from SHOW ENDPOINTS IN SERVICE ...
 .venv/bin/python test_inference.py                                             # verify both REST APIs
-.venv/bin/streamlit run app_streamlit.py                                       # http://localhost:8501
+cd web && npm install && npm run dev                                           # http://localhost:3000
+# alternative: .venv/bin/streamlit run app_streamlit.py                       # http://localhost:8501
 ```
+
+---
+
+## Web App (React)
+
+`inference/web/` is a Next.js app (TypeScript, Tailwind, shadcn/ui on Base UI, lucide-react). The browser only talks to the app's own server routes. The routes hold the PAT and call Snowflake over HTTPS:
+
+| Route | Calls | Purpose |
+|---|---|---|
+| `GET /api/samples` | SQL REST API `POST /api/v2/statements` | Reads the 6 demo POs live from `ML_INFERENCE.SAMPLE_REQUESTS` |
+| `POST /api/score` | Inference endpoint `POST /predict-proba` | Scores one order |
+| `POST /api/explain` | Cortex REST API `POST /api/v2/cortex/v1/chat/completions` | Plain-English explanation |
+
+| File | Purpose |
+|---|---|
+| `web/lib/server/snowflake.ts` | Server-only TypeScript port of `score_client.py` (same payload, headers, and prompt) |
+| `web/lib/model.ts` | Feature list, risk bands, retailer names, 18.3% network baseline |
+| `web/components/risk-checker.tsx` | The page: sample picker, order summary, inputs with tooltips, result, explanation, accordions |
+| `web/components/risk-gauge.tsx` | Semicircle gauge and Low/Watch/High scale |
+| `web/app/api/*/route.ts` | The three server routes |
+
+**Config:** the app reads `inference/.env` (the same file the Python client uses) and falls back to the `coco_conn` entry in `~/.snowflake/connections.toml` for the PAT, account, warehouse, and role. Nothing is configured in `web/` itself, and no token is sent to the browser.
+
+**Requirements:** Node.js 20+. `npm run build` produces a production build (`npm start` to serve it).
 
 ---
 
@@ -198,7 +225,7 @@ This could back a web form, a batch script, a webhook, or a supplier portal.
 | Cortex usage | `SNOWFLAKE.ACCOUNT_USAGE.CORTEX_REST_API_USAGE_HISTORY` |
 | Remove everything | `snow sql -f inference/99_teardown.sql --connection coco_conn` |
 
-- **Service:** one CPU_X64_S node on `SYSTEM_COMPUTE_POOL_CPU` bills while the service is running. Auto-suspend is set to **30 minutes**, and it auto-resumes on the next request (the first call after resume is slower).
+- **Service:** one CPU_X64_S node on `SYSTEM_COMPUTE_POOL_CPU` bills while the service is running. Auto-suspend is set to **15 minutes** (900 s, the minimum for a service with a public endpoint), and it auto-resumes on the next request (the first call after resume is slower).
 - **Cortex REST:** billed per token, roughly a fraction of a cent per explanation.
 
 ---
@@ -211,6 +238,7 @@ This could back a web form, a batch script, a webhook, or a supplier portal.
 | `HTTP 401/403` from Cortex | The PAT's role needs `SNOWFLAKE.CORTEX_USER`. Check the token-type header |
 | Slow first call | The service was auto-suspended. Warm it up with `test_inference.py` before presenting |
 | `INFERENCE_URL` error | `.env` is missing. Copy `.env.example` and set the URL |
+| Web app shows "Couldn't load sample orders" | The SQL REST API call failed: check VPN and the PAT, and that the connection has a warehouse set. Details are in the `npm run dev` terminal |
 | Service `FAILED` | Check `SYSTEM$GET_SERVICE_LOGS`. Versions are pinned (`xgboost==3.2.0`, `scikit-learn==1.7.2`) to packages available in Snowflake |
 
 ---

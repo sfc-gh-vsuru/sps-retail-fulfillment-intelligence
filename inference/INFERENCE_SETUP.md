@@ -18,6 +18,7 @@ Step-by-step setup for the inference add-on. It is fully separate from the main 
 | Network | On VPN / allowed IP | The account network policy `ACCOUNT_VPN_POLICY_SE` applies to both REST APIs |
 | Python 3.10 | `/Users/vsuru/anaconda3/bin/python --version` | Used only to create a separate venv |
 | Snowflake CLI | `snow --version` | For running the SQL files |
+| Node.js 20+ | `node --version` | For the web app in `web/` (optional if you use the Streamlit alternative) |
 
 All commands below are run from the **project root** unless noted.
 
@@ -110,8 +111,10 @@ SELECT SYSTEM$GET_SERVICE_STATUS('SPS_RETAIL_AI.ML_INFERENCE.FULFILLMENT_RISK_SV
 Set auto-suspend to control cost:
 
 ```sql
-ALTER SERVICE SPS_RETAIL_AI.ML_INFERENCE.FULFILLMENT_RISK_SVC SET AUTO_SUSPEND_SECS = 1800;
+ALTER SERVICE SPS_RETAIL_AI.ML_INFERENCE.FULFILLMENT_RISK_SVC SET AUTO_SUSPEND_SECS = 900;
 ```
+
+900 s (15 min) is the minimum Snowflake allows for a service with a public endpoint.
 
 ---
 
@@ -170,20 +173,29 @@ Verified output (also a fallback to show if a live call fails):
    negotiate a revised delivery date ...
 ```
 
-Then run the app:
+Then run the web app (Node.js 20+):
 
 ```bash
-.venv/bin/streamlit run app_streamlit.py    # http://localhost:8501
+cd web
+npm install          # first time only
+npm run dev          # http://localhost:3000
 ```
 
+No extra configuration is needed: the app's server routes read `inference/.env` and the `coco_conn` connection, the same as the Python client. The page loads the 6 sample orders live from `ML_INFERENCE.SAMPLE_REQUESTS` (SQL REST API).
+
 Score one low-risk and one high-risk sample. You should see:
-- the order summary card;
-- the risk % compared with a typical order;
-- a Low/Watch/High label with a recommended action;
-- the AI explanation;
+- the order summary tiles and a green or red "what actually happened" banner;
+- the risk gauge and a colored Low/Watch/High badge;
+- an up or down arrow showing the points above or below a typical order (18%);
+- the recommended action and "The model got it right";
+- the AI explanation (step 3);
 - the request and response under "Behind the scenes."
 
-For a what-if check, set **Days in transit** to 3 on the high-risk Foot Locker sample. The score should drop to about 23% (Watch).
+For a what-if check, set **Days in transit** to 3 on the high-risk Foot Locker sample (PO_008398) and score again. The gauge should drop to about 23% (Watch), with a `100% → 23% ↘` indicator.
+
+Verified (headless Chrome, no console errors): PO_008398 100% High · what-if 23% Watch · PO_007447 1% Low · AI toggle off skips the Cortex call · `npm run build` passes.
+
+Alternative without Node: `.venv/bin/streamlit run app_streamlit.py` (http://localhost:8501) shows the same flow in Streamlit.
 
 ---
 
@@ -226,8 +238,8 @@ ALTER SERVICE SPS_RETAIL_AI.ML_INFERENCE.FULFILLMENT_RISK_SVC SUSPEND;
 - [ ] `ML_INFERENCE` schema created, baseline counts saved
 - [ ] `inference/.venv` created with pinned packages
 - [ ] `FULFILLMENT_RISK_XGB` V2 registered (PREDICT, PREDICT_PROBA)
-- [ ] `FULFILLMENT_RISK_SVC` all containers READY, auto-suspend 30 min
+- [ ] `FULFILLMENT_RISK_SVC` all containers READY, auto-suspend 15 min
 - [ ] `inference/.env` has `INFERENCE_URL`
 - [ ] `test_inference.py` passes (scores + Cortex explanation)
-- [ ] Streamlit app scores low and high samples
+- [ ] Web app (`web/`, localhost:3000) loads samples and scores low and high orders
 - [ ] Main demo counts unchanged

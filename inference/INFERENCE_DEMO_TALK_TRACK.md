@@ -11,7 +11,7 @@
 | Field | Value |
 |---|---|
 | **Duration** | ~5 min (2-min short version below) |
-| **What runs where** | Local Streamlit app on the presenter's laptop (`localhost:8501`). Model and LLM run in Snowflake |
+| **What runs where** | Local Next.js web app on the presenter's laptop (`localhost:3000`). Model and LLM run in Snowflake |
 | **Snowflake objects** | Model `SPS_RETAIL_AI.ML_INFERENCE.FULFILLMENT_RISK_XGB` V2 · Service `ML_INFERENCE.FULFILLMENT_RISK_SVC` |
 | **APIs shown** | Snowflake ML real-time inference REST API (`/predict-proba`) · Cortex REST API (`/api/v2/cortex/v1/chat/completions`, `claude-sonnet-4-5`) |
 | **Audience** | Developers, architects, SPS product teams, partners building on SPS data |
@@ -41,7 +41,7 @@
   ```bash
   cd inference && .venv/bin/python test_inference.py
   ```
-- [ ] Start the app: `.venv/bin/streamlit run app_streamlit.py` → open `http://localhost:8501`
+- [ ] Start the app: `cd web && npm run dev` → open `http://localhost:3000` (fallback: `.venv/bin/streamlit run app_streamlit.py` → `http://localhost:8501`)
 - [ ] In Snowsight, open **AI & ML → Models → FULFILLMENT_RISK_XGB** in a tab
 - [ ] Terminal open in `inference/`, font enlarged
 
@@ -87,20 +87,20 @@
 
 ## Step 3: An App Outside Snowflake (2–3 min)
 
-**Show:** `http://localhost:8501` (SPS PO Risk Checker)
+**Show:** `http://localhost:3000` (SPS PO Risk Checker)
 
-> "This app is running on my laptop, not in Snowflake. It's one Python file. It's written for a business user: the top explains the problem and the three steps, every input has a hover tip, and the results say what to do."
+> "This app is running on my laptop, not in Snowflake. It's a standard React web app, the kind a product team would build for a supplier portal. It's written for a business user: the top explains the problem and the three steps, every input has a hover tip, and the results are color-coded and say what to do."
 
-1. **Low risk.** Select `Bass Pro Shops · PO_007447 · low risk example`. Read the order summary card aloud (units, value, supplier history, what actually happened), then click **Score this order**.
-   > "1% chance of arriving late or short, 17 points below a typical order. Green, no action needed. Cortex says why: this supplier has a strong history with this retailer and the shipment is moving well ahead of schedule."
-2. **High risk.** Select `Foot Locker · PO_008398 · high risk example` and click **Score this order**.
-   > "Near 100%, red, act now. The explanation points to the delivery window running short of the supplier's typical lead time, and suggests a concrete action: expedite or renegotiate the date. In history, this order was in fact late."
-3. **What-if.** On the high-risk order, lower **Days in transit** from 11 to 3 and re-score.
-   > "Change one input and the score drops from 100% to about 23%, from High to Watch. The app flags that we're now in what-if mode. This is what a supplier portal or a receiving-dock tool would do in real time."
+1. **Low risk.** Click the **Bass Pro Shops · PO_007447** card (green dot, "Arrived OTIF"). Read the summary tiles aloud (units, value, supplier history, usual lead time) and the green "what actually happened" banner, then click **Score this order**.
+   > "The gauge settles at 1%. Green Low Risk badge, and a down arrow: 17 points below a typical order. No action needed, and the model got it right. Cortex says why: this supplier has a strong history with this retailer and the shipment is moving well ahead of schedule."
+2. **High risk.** Click the **Foot Locker · PO_008398** card (red dot) and score it.
+   > "Now the gauge swings to 100%. Red High Risk badge, up arrow, 82 points above typical, act now. The explanation points to the delivery window running short of the supplier's typical lead time, and suggests a concrete action: expedite or renegotiate the date. In history, this order was in fact late."
+3. **What-if.** On the high-risk order, lower **Days in transit** from 11 to 3 and score again.
+   > "Change one input and the indicator shows 100% → 23%, with a down arrow. It drops from High to Watch, amber. The app flags that we're in what-if mode and offers a Reset. This is what a supplier portal or a receiving-dock tool would do in real time."
 4. **How to read it.** Open **How to read the score**.
    > "Plain-language bands, the typical-order baseline, and how often the model is right, so a business user knows how much to trust it."
 5. **Behind the scenes.** Open **Behind the scenes (technical)**.
-   > "For the technical audience: exactly what was sent, a small JSON payload of order details, and what came back, two probabilities. Response times are shown. The app never touched a table. It only sees the score."
+   > "For the technical audience: the flow is laptop, HTTPS with a token, the ML endpoint, and Cortex. Here's exactly what was sent, a small JSON payload of order details, and what came back, two probabilities, with response times. The token stays on the app's server. The browser never sees it."
 
 ---
 
@@ -123,7 +123,7 @@
 ## Short Version (2 min)
 
 1. Run `test_inference.py` (45 s): "two HTTPS calls, a score and an explanation."
-2. In the app, score the high-risk order, change days in transit to 3 and re-score, then open "Behind the scenes" (60 s).
+2. In the app, score the high-risk order, change days in transit to 3 and re-score (watch the 100% → 23% arrow), then open "Behind the scenes" (60 s).
 3. One governance sentence (15 s).
 
 ---
@@ -140,11 +140,11 @@ Not with this dataset. We tried that first (V1, pre-ship features only), and it 
 About a second for a batch of 6 on a warm CPU service. The first call after auto-suspend takes longer, which is why we warm it up. The Cortex explanation takes a few seconds because it's generating text.
 
 **"What does it cost?"**
-- **Endpoint:** one small CPU node while the service runs. It auto-suspends after 30 minutes idle and resumes on demand.
+- **Endpoint:** one small CPU node while the service runs. It auto-suspends after 15 minutes idle and resumes on demand.
 - **Cortex:** billed per token, a fraction of a cent per explanation.
 
 **"Could this be a web or mobile app?"**
-Yes. `score_client.py` is ~150 lines of `requests`. Any backend (Python, Node, Java, .NET) can make the same two calls. Keep the PAT on the server side, not in browser JavaScript.
+It already is: the demo app is a standard Next.js web app. Its server routes (`web/lib/server/snowflake.ts`, a TypeScript port of `score_client.py`) make the same HTTPS calls, and the PAT stays on the server, never in browser JavaScript. Any backend (Python, Node, Java, .NET) can do the same. For production you'd host it anywhere, or inside Snowflake on SPCS, and use OAuth instead of a personal token.
 
 **"Can we log the predictions?"**
 Yes. Recreating the service with Auto-Capture enabled logs every request and response to an inference table, for monitoring, drift checks, and retraining. It's off in this demo.

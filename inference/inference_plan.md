@@ -180,7 +180,7 @@ inference/
 | Item | Cost driver | Control |
 |---|---|---|
 | Training | Warehouse `COCOWH` for data pull plus local training | One-time, a few minutes |
-| Inference service | 1 CPU_X64_S node while the service runs | Set auto-suspend (e.g., 30 min). `ALTER SERVICE ... SUSPEND` after the demo |
+| Inference service | 1 CPU_X64_S node while the service runs | Set auto-suspend (15 min, the minimum for public endpoints). `ALTER SERVICE ... SUSPEND` after the demo |
 | Cortex REST | Tokens per explanation (`claude-sonnet-4-5` or `mistral-large2`) | Pennies per call. Visible in `CORTEX_REST_API_USAGE_HISTORY` |
 
 ---
